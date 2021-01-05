@@ -3,7 +3,7 @@
     "description": "It is a module for use a well-tried structure",
     "license": "MIT",
     "devDependencies": {
-        "wapplr-cli": "1.0.0"
+        "wapplr-cli": "^1.0.0"
     },
     "engines": {
         "node": ">=12.0.0"
