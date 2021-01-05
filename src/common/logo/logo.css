@@ -1,0 +1,19 @@
+.logo {
+    height: 100%;
+    width: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+    height: 90%;
+    width: auto;
+}
+
+.svg {
+    height: 100%;
+    width: auto;
+    display: flex;
+    max-width: 100%;
+}
