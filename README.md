@@ -20,14 +20,14 @@ These wonderful packages have inspired us, so there are many similarities with t
 
 ## Installation
 
-```console
+```sh
 npm install wapplr
 ```
 
 ## Usage
 
 The easiest way to use it: 
-```console
+```sh
 // on the current folder
 npx wapplr-cli create my-package
 npx wapplr-cli start
