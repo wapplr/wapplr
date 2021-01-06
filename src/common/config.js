@@ -9,11 +9,11 @@ export default function getConfig(p = {}){
         ...globalsConfig,
         DEV: (typeof DEV !== "undefined") ? DEV : (typeof globalsConfig.DEV !== "undefined") ? globalsConfig.DEV : false,
         WAPP: (typeof WAPP !== "undefined") ? WAPP : (typeof globalsConfig.WAPP !== "undefined") ? globalsConfig.WAPP : "buildHash",
-        RUN: (typeof RUN !== "undefined") ? RUN : (typeof globalsConfig.RUN !== "undefined") ? globalsConfig.RUN : false,
-        TYPE: (typeof TYPE !== "undefined") ? TYPE : (typeof globalsConfig.TYPE !== "undefined") ? globalsConfig.TYPE : false,
+        RUN: (typeof RUN !== "undefined") ? RUN : (typeof globalsConfig.RUN !== "undefined") ? globalsConfig.RUN : "",
+        TYPE: (typeof TYPE !== "undefined") ? TYPE : (typeof globalsConfig.TYPE !== "undefined") ? globalsConfig.TYPE : "",
     }
 
-    const dirname = (globalsConfig.ROOT) ? globalsConfig.ROOT : (globals.TYPE === "start" && typeof __dirname !== "undefined") ? __dirname : (typeof process !== "undefined") ? process.cwd() : "/"
+    const dirname = (globalsConfig.ROOT) ? globalsConfig.ROOT : (typeof process !== "undefined") ? process.cwd() : "/";
     globals.ROOT = dirname;
 
     const common = {

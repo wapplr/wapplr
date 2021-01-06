@@ -14,7 +14,7 @@ export default function getConfig(p = {}){
 
     let assets = serverConfig.assets;
     let credentials = serverConfig.credentials;
-    const dirname = globals.ROOT;
+    const dirname = globals.ROOT || __dirname;
 
     try {
         if (!assets && fs.existsSync(path.resolve(dirname, "./asset-manifest.json"))){
@@ -42,7 +42,7 @@ export default function getConfig(p = {}){
         ...serverConfig,
         port: serverConfig.port || 80,
         portSSL: serverConfig.portSSL || 443,
-        publicPath: path.resolve(dirname || __dirname, "public"),
+        publicPath: path.resolve(dirname, "public"),
         assets: assets,
         credentials: credentials
     }
