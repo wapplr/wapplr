@@ -12,19 +12,16 @@ export function createMiddleware(p = {}) {
 }
 
 export function run(p = {}) {
-
     const wapp = createServer(p);
     const globals = wapp.globals;
     const {DEV} = globals;
 
     const app = wapp.server.app;
-    if (typeof DEV !== "undefined" && DEV && module.hot) {
-        app.hot = module.hot;
-    }
-
     wapp.server.listen();
+
     if (typeof DEV !== "undefined" && DEV && module.hot){
-        module.hot.accept("./index");
+        app.hot = module.hot;
+        module.hot.accept("./index.js");
     }
 
     return wapp;

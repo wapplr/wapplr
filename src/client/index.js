@@ -15,10 +15,15 @@ export function run(p = {}) {
     const wapp = createClient(p);
     const globals = wapp.globals;
     const {DEV} = globals;
+
+    const app = wapp.client.app;
     wapp.client.listen();
+
     if (typeof DEV !== "undefined" && DEV && module.hot){
-        module.hot.accept();
+        app.hot = module.hot;
+        module.hot.accept("./index.js");
     }
+
     return wapp;
 }
 

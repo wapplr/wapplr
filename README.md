@@ -156,13 +156,16 @@ Same file is created when you create the package with wapplr-cli:
 import wapplrServer from "wapplr";
 
 export default async function createServer(p = {}) {
+    // noinspection UnnecessaryLocalVariableJS
     const wapp = p.wapp || wapplrServer({...p});
     /*code here myFunction(wapp)*/
     return wapp;
 }
 
 export function createMiddleware(p = {}) {
-    return async function yourMiddleware(req, res, next) {
+    // noinspection JSUnusedAssignment,JSUnusedLocalSymbols
+    return async function middleware(req, res, next) {
+        // eslint-disable-next-line no-unused-vars
         const wapp = req.wapp || p.wapp || await createServer(p);
         /*code here myFunction(req, res, next)*/
         next();
@@ -182,26 +185,20 @@ const defaultConfig = {
 }
 
 export async function run(p = defaultConfig) {
-
     const wapp = await createServer(p);
     const globals = wapp.globals;
     const {DEV} = globals;
-    
-    const app = wapp.server.app;
-    if (typeof DEV !== "undefined" && DEV && module.hot) {
-        app.hot = module.hot;
-    }
-    
-    app.use(createMiddleware({wapp, ...p}));
 
+    const app = wapp.server.app;
+    app.use(createMiddleware({wapp, ...p}));
     wapp.server.listen();
 
     if (typeof DEV !== "undefined" && DEV && module.hot){
-        module.hot.accept("./index");
+        app.hot = module.hot;
+        module.hot.accept("./index.js");
     }
 
     return wapp;
-
 }
 
 if (typeof RUN !== "undefined" && RUN === "my-package") {
@@ -226,13 +223,16 @@ Same file is created when you create the package with wapplr-cli:
 import wapplrClient from "wapplr";
 
 export default function createClient(p) {
+    // noinspection UnnecessaryLocalVariableJS
     const wapp = p.wapp || wapplrClient({...p});
     /*code here myFunction(wapp)*/
     return wapp;
 }
 
 export function createMiddleware(p = {}) {
-    return function yourMiddleware(req, res, next) {
+    // noinspection JSUnusedAssignment,JSUnusedLocalSymbols
+    return function middleware(req, res, next) {
+        // eslint-disable-next-line no-unused-vars
         const wapp = req.wapp || p.wapp || createClient(p);
         /*code here myFunction(req, res, next)*/
         next();
@@ -257,11 +257,12 @@ export function run(p = defaultConfig) {
     const {DEV} = globals;
 
     const app = wapp.client.app;
-    app.use(createMiddleware({wapp, ...p}))
+    app.use(createMiddleware({wapp, ...p}));
     wapp.client.listen();
 
     if (typeof DEV !== "undefined" && DEV && module.hot){
-        module.hot.accept();
+        app.hot = module.hot;
+        module.hot.accept("./index.js");
     }
 
     return wapp;
@@ -270,6 +271,7 @@ export function run(p = defaultConfig) {
 if (typeof RUN !== "undefined" && RUN === "my-package") {
     run();
 }
+
 ```
 
 ## Documentation
