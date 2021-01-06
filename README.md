@@ -1,8 +1,96 @@
 # Wapplr
 
 Wapplr is a middleware-style web application that runs on both the server and client side.
-The server works the same as [express](https://github.com/expressjs/express) (with some differences),
+The server works same as the [express](https://github.com/expressjs/express) (with some differences),
 on the client side works similarly, but the new request starts with a change location handler.
+
+```js
+//server.js
+const setMyContents = require("./common.js");
+const wapplrServer = require("wapplr");
+const wapp = wapplrServer({config: {
+        globals: {
+            WAPP: "yourBuildHash",
+            ROOT: __dirname
+        }
+    }
+});
+setMyContents({wapp});
+wapp.server.listen();
+```
+
+```js
+//client.js
+const setMyContents = require("./common.js");
+const wapplrClient = require("wapplr");
+const wapp = wapplrClient({config: {
+        globals: {
+            WAPP: "yourBuildHash"
+        }
+    }
+});
+setMyContents({wapp});
+wapp.client.listen();
+```
+
+```js
+//common.js
+const style = require('./style.css');
+export default function setMyContents(p = {}) {
+
+    const {wapp} = p;
+
+    wapp.contents.add({
+        home: {
+            render: function (p = {}) {
+                const {wapp} = p;
+                const {request, response, styles} = wapp;
+                styles.use(style);
+                
+                return `
+                <div class="${style.home}">
+                    HOME
+                </div>
+                `
+            },
+            description: "My first app",
+        }
+    })
+
+    wapp.router.replace([
+        {path: "/", contentName: "home"}
+    ])
+
+    wapp.router.add([
+        {path: "/about", contentName: "home"},
+        {path: "/contact", contentName: "home"},
+    ])
+
+}
+```
+
+```css
+/*style.css*/
+.home{
+    color: black;
+}
+```
+
+### Use it as an Express middleware
+
+If you would like to use the Wapplr, or your package what you build with Wapplr as an express middleware you can do that:
+
+```js
+//server.js
+import wapplrServer from "wapplr";
+const express = require('express')
+const app = express()
+const wapp = wapplrServer();
+setMyContents({wapp});
+/*...*/
+app.use(wapp.server.app);
+app.listen(3000);
+```
 
 ## Why
 
@@ -24,13 +112,13 @@ These wonderful packages have inspired us, so there are many similarities with t
 npm install wapplr
 ```
 
-## Usage
+## Usage with [wapplr-cli](https://github.com/wapplr/wapplr-cli)
 
-The easiest way to use it: 
+The easiest way to use, it will create a new package to the current folder with "my-package" name then start it.
 ```sh
+npm install -g wapplr-cli
 // on the current folder
-npx wapplr-cli create my-package
-npx wapplr-cli start
+npx wapplr-cli start my-package
 ```
 
 ## Wapplr lifecycle
@@ -48,20 +136,23 @@ This state what the server side render will put to the html body, and the client
 - Contents: this middleware find the content by the route data. The content contain a render function, that will run at the end.
 - Styles: collects the styles what are used on the content. On the server side generate a text from styles. 
   On the client side remove the collected styles, and put per components.
-- Render: render the content. On server side it set headers and send response. On client side change the container content. 
+- Render: it renders the content if that is exists: on server side it set headers and send response. On client side change the container content. 
 - Log: log some data
 
-## Server side initialize
+## HOC - Server side initialize
 
-This example show you how can create a server what you can use as a main process or a middleware too.
+This example show you how can create a reusable module with a server what you can use as a main process or a middleware too.
 If you want to start or build with wapplr-cli need to:
 
 - Export a function what return a "wapp" object
-- Export a "run" function what listening a server
-- Run it if the RUN is same as your package name
-- Optional export the createMiddleware, if you would like to use your package as a middleware.
+- Export a middleware function, if you would like to reuse your package as a middleware.
+- Export a "run" function what listening the server
+- Run it if the RUN global variable is same as your package name. Need to set "globals" from here.
+
+Same file is created when you create the package with wapplr-cli:
 
 ```js
+//server/index.js
 import wapplrServer from "wapplr";
 
 export default async function createServer(p = {}) {
@@ -78,7 +169,19 @@ export function createMiddleware(p = {}) {
     }
 }
 
-export async function run(p = {}) {
+const defaultConfig = {
+    config: {
+        globals: {
+            DEV: (typeof DEV !== "undefined") ? DEV : undefined,
+            WAPP: (typeof WAPP !== "undefined") ? WAPP : undefined,
+            RUN: (typeof RUN !== "undefined") ? RUN : undefined,
+            TYPE: (typeof TYPE !== "undefined") ? TYPE : undefined,
+            ROOT: (typeof ROOT !== "undefined") ? ROOT : __dirname
+        }
+    }
+}
+
+export async function run(p = defaultConfig) {
 
     const wapp = await createServer(p);
     const globals = wapp.globals;
@@ -102,45 +205,24 @@ export async function run(p = {}) {
 }
 
 if (typeof RUN !== "undefined" && RUN === "my-package") {
-    run({
-        config: {
-            globals: {
-                DEV: (typeof DEV !== "undefined") ? DEV : undefined,
-                WAPP: (typeof WAPP !== "undefined") ? WAPP : undefined,
-                RUN: (typeof RUN !== "undefined") ? RUN : undefined,
-                TYPE: (typeof TYPE !== "undefined") ? TYPE : undefined,
-            }
-        }
-    });
+    run();
 }
 ```
 
-### Use it as an Express middleware
+## HOC - Client side initialize
 
-If you would like to use the Wapplr, or your package what you build with Wapplr as an express middleware you can do that:
-
-```js
-import wapplrServer from "wapplr";
-const express = require('express')
-const app = express()
-const wapp = wapplrServer();
-/*...*/
-app.use(wapp.server.app)
-```
-
-## Client side initialize
-
-This example show you how can create a client what you can use as a main process or a middleware too.
+This example show you how can create a reusable module with a client what you can use as a main process or a middleware too.
 If you want to start or build with wapplr-cli need to:
 
 - Export a function what return a "wapp" object
-- Export a "run" function what listening a server
-- Run it if the RUN is same as your package name
-- Optional export the createMiddleware, if you would like to use your package as a middleware.
+- Export a middleware function, if you would like to reuse your package as a middleware.
+- Export a "run" function what listening the client
+- Run it if the RUN global variable is same as your package name. Need to set "globals" from here.
 
-(it is very similar as the server side code)
+Same file is created when you create the package with wapplr-cli:
 
 ```js
+//client/index.js
 import wapplrClient from "wapplr";
 
 export default function createClient(p) {
@@ -157,7 +239,19 @@ export function createMiddleware(p = {}) {
     }
 }
 
-export function run(p = {}) {
+const defaultConfig = {
+    config: {
+        globals: {
+            DEV: (typeof DEV !== "undefined") ? DEV : undefined,
+            WAPP: (typeof WAPP !== "undefined") ? WAPP : undefined,
+            RUN: (typeof RUN !== "undefined") ? RUN : undefined,
+            TYPE: (typeof TYPE !== "undefined") ? TYPE : undefined,
+            ROOT: (typeof ROOT !== "undefined") ? ROOT : "/"
+        }
+    }
+}
+
+export function run(p = defaultConfig) {
     const wapp = createClient(p);
     const globals = wapp.globals;
     const {DEV} = globals;

@@ -11,10 +11,8 @@ export default function getConfig(p = {}){
         WAPP: (typeof WAPP !== "undefined") ? WAPP : (typeof globalsConfig.WAPP !== "undefined") ? globalsConfig.WAPP : "buildHash",
         RUN: (typeof RUN !== "undefined") ? RUN : (typeof globalsConfig.RUN !== "undefined") ? globalsConfig.RUN : "",
         TYPE: (typeof TYPE !== "undefined") ? TYPE : (typeof globalsConfig.TYPE !== "undefined") ? globalsConfig.TYPE : "",
+        ROOT: (typeof ROOT !== "undefined") ? ROOT : (typeof globalsConfig.ROOT !== "undefined") ? globalsConfig.ROOT : (typeof __dirname !== "undefined") ? __dirname : "/",
     }
-
-    const dirname = (globalsConfig.ROOT) ? globalsConfig.ROOT : (typeof process !== "undefined") ? process.cwd() : "/";
-    globals.ROOT = dirname;
 
     const common = {
         ...commonConfig,
