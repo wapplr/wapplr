@@ -31,7 +31,7 @@ export default function createClient(p = {}) {
     function defaultListen () {
         wapplrClient.close();
         wapplrClient.history.listen(function ({action, location}) {
-            wapplrClient.app({history: {action, location}})
+            wapplrClient.app({history: {action, location}});
         });
         wapplrClient.app({history: {action: "POP", location: history.location}});
 

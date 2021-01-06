@@ -46,8 +46,8 @@ export function createDefaultStyleManager(p = {}) {
             const moduleId = (style._module && style._module.id) ? style._module.id : "";
             return insertCss(cssText, moduleId);
         }
-        if (style._module && style._module.hot){
-            module.hot.accept(style._module.id);
+        if (style._module && style._module.hot && wapp.getTargetObject().hot){
+            wapp.getTargetObject().hot.accept(style._module.id);
         }
 
         let css = styleManager.css;
