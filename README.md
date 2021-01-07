@@ -6,8 +6,8 @@ on the client side works similarly, but the new request starts with a change loc
 
 ```js
 //server.js
-const setMyContents = require("./common.js");
-const wapplrServer = require("wapplr");
+import setMyContents from "./common.js";
+import wapplrServer from "wapplr";
 const wapp = wapplrServer({config: {
         globals: {
             WAPP: "yourBuildHash",
@@ -21,8 +21,8 @@ wapp.server.listen();
 
 ```js
 //client.js
-const setMyContents = require("./common.js");
-const wapplrClient = require("wapplr");
+import setMyContents from "./common.js";
+import wapplrClient from "wapplr";
 const wapp = wapplrClient({config: {
         globals: {
             WAPP: "yourBuildHash"
@@ -35,7 +35,7 @@ wapp.client.listen();
 
 ```js
 //common.js
-const style = require('./style.css');
+import style from "./style.css";
 export default function setMyContents(p = {}) {
 
     const {wapp} = p;
@@ -83,8 +83,8 @@ If you would like to use the Wapplr, or your package what you build with Wapplr 
 ```js
 //server.js
 import wapplrServer from "wapplr";
-const express = require('express')
-const app = express()
+import express from "express";
+const app = express();
 const wapp = wapplrServer();
 setMyContents({wapp});
 /*...*/
@@ -195,7 +195,7 @@ export async function run(p = defaultConfig) {
 
     if (typeof DEV !== "undefined" && DEV && module.hot){
         app.hot = module.hot;
-        module.hot.accept("./index.js");
+        module.hot.accept("./index");
     }
 
     return wapp;
@@ -262,7 +262,7 @@ export function run(p = defaultConfig) {
 
     if (typeof DEV !== "undefined" && DEV && module.hot){
         app.hot = module.hot;
-        module.hot.accept("./index.js");
+        module.hot.accept();
     }
 
     return wapp;

@@ -21,7 +21,7 @@ export function run(p = {}) {
 
     if (typeof DEV !== "undefined" && DEV && module.hot){
         app.hot = module.hot;
-        module.hot.accept("./index.js");
+        module.hot.accept("./index");
     }
 
     return wapp;
