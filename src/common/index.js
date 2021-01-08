@@ -1,4 +1,4 @@
-import {defaultDescriptor} from './utils.js';
+import {defaultDescriptor, mergeProperties} from './utils.js';
 import getConfig from "./config";
 
 export default function createWapp(p = {}) {
@@ -7,28 +7,32 @@ export default function createWapp(p = {}) {
     const commonConfig = config.common;
     const globalConfig = config.globals;
 
+    const {containerElementId, appStateName, siteName, description, lang, ...rest} = commonConfig;
+
     const defaultSettings = Object.create(Object.prototype, {
         containerElementId: {
             ...defaultDescriptor,
-            value: commonConfig.containerElementId
+            value: containerElementId
         },
         appStateName: {
             ...defaultDescriptor,
-            value: commonConfig.appStateName
+            value: appStateName
         },
         siteName: {
             ...defaultDescriptor,
-            value: commonConfig.siteName
+            value: siteName
         },
         description: {
             ...defaultDescriptor,
-            value: commonConfig.description
+            value: description
         },
         lang: {
             ...defaultDescriptor,
-            value: commonConfig.lang
+            value: lang
         }
     })
+
+    mergeProperties(defaultSettings, rest);
 
     const defaultGlobals = Object.create(Object.prototype, {
         DEV: {

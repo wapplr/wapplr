@@ -146,12 +146,11 @@ export default function createRequests(p = {}) {
 
             const target = wapp.getTargetObject();
 
-            const globalGraphqlConfig = (target.settings && target.settings.graphqlConfig) ? target.settings.graphqlConfig : {};
-            const config = (p.config) ? {...globalGraphqlConfig, ...p.config} : {...globalGraphqlConfig};
+            const globalGraphqlConfig = (target.settings && target.settings.graphql) ? target.settings.graphql : {};
 
             const {
-                graphqlRoute = "/graphql",
-            } = config;
+                route = "/graphql",
+            } = globalGraphqlConfig;
 
             const state = wapp.response.store.getState();
             const {res = {}} = state;
@@ -206,7 +205,7 @@ export default function createRequests(p = {}) {
                 const requestData = requests[requestName];
                 const schema = requestData.schema;
 
-                const url = graphqlRoute;
+                const url = route;
                 const options = {
                     getBody: function getBody(p = {}){
                         let fields = getFieldsNameFromProperties(schema.properties);

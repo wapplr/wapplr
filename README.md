@@ -190,7 +190,7 @@ export async function run(p = defaultConfig) {
     const {DEV} = globals;
 
     const app = wapp.server.app;
-    app.use(createMiddleware({wapp, ...p}));
+    app.use(createMiddleware({wapp}));
     wapp.server.listen();
 
     if (typeof DEV !== "undefined" && DEV && module.hot){
@@ -257,7 +257,7 @@ export function run(p = defaultConfig) {
     const {DEV} = globals;
 
     const app = wapp.client.app;
-    app.use(createMiddleware({wapp, ...p}));
+    app.use(createMiddleware({wapp}));
     wapp.client.listen();
 
     if (typeof DEV !== "undefined" && DEV && module.hot){
