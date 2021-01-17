@@ -71,53 +71,67 @@ function createWappMiddleware(p = {}) {
             Object.defineProperty(res, "_originalStatusFunction", {...defaultDescriptor, writable: false, enumerable: false, value: res.status});
             res.status = function (...attributes) {
 
-                const http1 = (req.httpVersion === "1.1" || (req.httpVersion && Number(req.httpVersion.split(".")[0]) === 1))
-                const tempStatusCode = res.statusCode;
-                let tempStatusMessage = wapp.response.statusMessage;
-                if (http1) {
-                   tempStatusMessage = res.statusMessage;
-                }
+                if (!wapp.response.sended) {
 
-                const statusCode = attributes[0];
-                const error = attributes[1];
-                const isError = !!(error && error.message && error.stack);
-                wapp.response.statusCode = attributes[0];
-
-                if (statusCode) {
-                    if (statusCode === 200) {
-                        wapp.response.statusMessage = (tempStatusCode === 200 && tempStatusMessage) ? tempStatusMessage : "OK";
-                    }
-                    if (statusCode === 304) {
-                        wapp.response.statusMessage = (tempStatusCode === 304 && tempStatusMessage) ? tempStatusMessage : "Not modified";
-                    }
-                    if (statusCode === 404) {
-                        wapp.response.statusMessage = (tempStatusCode === 404 && tempStatusMessage) ? tempStatusMessage : "Not found";
-                    }
-                    if (statusCode === 500) {
-                        wapp.response.statusMessage = (isError && error.message) ? error.name + ": " + error.message : (tempStatusCode === 500 && tempStatusMessage) ? tempStatusMessage : "Error: Internal Server Error";
-                    }
+                    const http1 = (req.httpVersion === "1.1" || (req.httpVersion && Number(req.httpVersion.split(".")[0]) === 1))
+                    const tempStatusCode = res.statusCode;
+                    let tempStatusMessage = wapp.response.statusMessage;
                     if (http1) {
-                        res.statusMessage = wapp.response.statusMessage;
+                        tempStatusMessage = res.statusMessage;
                     }
+
+                    const statusCode = attributes[0];
+                    const error = attributes[1];
+                    const isError = !!(error && error.message && error.stack);
+                    wapp.response.statusCode = attributes[0];
+
+                    if (statusCode) {
+                        if (statusCode === 200) {
+                            wapp.response.statusMessage = (tempStatusCode === 200 && tempStatusMessage) ? tempStatusMessage : "OK";
+                        }
+                        if (statusCode === 304) {
+                            wapp.response.statusMessage = (tempStatusCode === 304 && tempStatusMessage) ? tempStatusMessage : "Not modified";
+                        }
+                        if (statusCode === 404) {
+                            wapp.response.statusMessage = (tempStatusCode === 404 && tempStatusMessage) ? tempStatusMessage : "Not found";
+                        }
+                        if (statusCode === 500) {
+                            wapp.response.statusMessage = (isError && error.message) ? error.name + ": " + error.message : (tempStatusCode === 500 && tempStatusMessage) ? tempStatusMessage : "Error: Internal Server Error";
+                        }
+                        if (http1) {
+                            res.statusMessage = wapp.response.statusMessage;
+                        }
+                    }
+
+                    return res._originalStatusFunction(...attributes);
+
                 }
 
-                return res._originalStatusFunction(...attributes);
             }
         }
 
         if (res.send && !res._originalSendFunction) {
             Object.defineProperty(res, "_originalSendFunction", {...defaultDescriptor, writable: false, enumerable: false, value: res.send});
             res.send = function (...attributes) {
-                if (!res.sendData) {
-                    res.sendData = {};
+
+                if (!wapp.response.sended) {
+
+                    if (!res.sendData) {
+                        res.sendData = {};
+                    }
+                    if (!res.sendData.data && attributes[0]) {
+                        res.sendData.data = attributes[0]
+                    }
+                    // eslint-disable-next-line no-unused-vars
+                    const [_, ...restAttr] = attributes;
+
+                    wappMiddleware.runSendMiddlewares(req, res, function next() {
+                        const html = (res.sendData && res.sendData.data) ? res.sendData.data : attributes[0];
+                        wapp.response.sended = true;
+                        res._originalSendFunction(...[html, ...restAttr]);
+                    });
+
                 }
-                if (!res.sendData.data && attributes[0]){
-                    res.sendData.data = attributes[0]
-                }
-                wappMiddleware.runSendMiddlewares(req, res, function next() {
-                    const html = (res.sendData && res.sendData.data) ? res.sendData.data : attributes[0];
-                    return res._originalSendFunction(html)
-                });
             }
         }
 

@@ -134,12 +134,14 @@ export default function createWapp(p = {}) {
         },
         containerElementId: {
             ...defaultDescriptor,
-            enumerable: false,
             value: null
         },
         appStateName: {
             ...defaultDescriptor,
-            enumerable: false,
+            value: null
+        },
+        sended: {
+            ...defaultDescriptor,
             value: null
         },
 

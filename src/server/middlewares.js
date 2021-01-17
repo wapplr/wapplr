@@ -37,6 +37,7 @@ export function createRenderMiddleware(p = {}) {
             res.status(wapp.response.statusCode || 200);
             const render = wapp.contents.getComponent("html");
             res.send(render(wapp).replace(/>\s+</g, "><"));
+
             next();
 
         } else {

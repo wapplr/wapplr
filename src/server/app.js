@@ -203,12 +203,13 @@ export default function createApp(p = {}) {
                 if (err){
                     return app.errorHandler(err, req, res);
                 }
-                res.status(404);
-                const requestMethod = req.method;
-                const requestUrl = req.url;
                 if (!res.headersSent) {
-                    res.send(requestMethod + " " + requestUrl);
+                    res.status(404);
+                    const requestMethod = req.method;
+                    const requestUrl = req.url;
+                    return res.send(requestMethod + " " + requestUrl);
                 }
+                return null;
             }
 
             await app.handle(req, res, next || defaultOut);

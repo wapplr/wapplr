@@ -264,6 +264,7 @@ export default function createStates(p = {}) {
         const init = (!wapp.response.store);
 
         const store = wapp.response.store || wapp.states.stateManager.createStore(wapp.states.stateManager.rootReducer, initState);
+
         if (init){
             Object.defineProperty(wapp.response, 'store', {
                 writable: true,

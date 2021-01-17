@@ -2,7 +2,7 @@ import {defaultDescriptor, mergeProperties} from "./utils";
 
 export function createDefaultStyleManager(p = {}) {
 
-    const {wapp = {}} = p;
+    const {wapp} = p;
 
     function defaultInsertCss(css, moduleId) {
 
