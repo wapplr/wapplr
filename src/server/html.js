@@ -40,7 +40,7 @@ export default function html(wapp) {
         return "";
     }).join(" ");
 
-    const stateText = `<script>window["${appStateName}"] = JSON.parse('${JSON.stringify(state || {})}')</script>`;
+    const stateText = `<script>window["${appStateName}"] = ${JSON.stringify(state || {})}</script>`;
 
     wapp.styles.use(style);
     const styles = wapp.styles.getCssText();
