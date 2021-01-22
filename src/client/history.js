@@ -1,29 +1,5 @@
 import {defaultDescriptor, mergeProperties} from "../common/utils";
 
-function parsePath(path) {
-    let partialPath = {};
-
-    if (path) {
-        let hashIndex = path.indexOf("#");
-        if (hashIndex >= 0) {
-            partialPath.hash = path.substr(hashIndex);
-            path = path.substr(0, hashIndex);
-        }
-
-        let searchIndex = path.indexOf("?");
-        if (searchIndex >= 0) {
-            partialPath.search = path.substr(searchIndex);
-            path = path.substr(0, searchIndex);
-        }
-
-        if (path) {
-            partialPath.pathname = path;
-        }
-    }
-
-    return partialPath;
-}
-
 function createPath({pathname = "/", search = "", hash = ""}) {
     return pathname + search + hash;
 }
@@ -98,6 +74,30 @@ function createHistoryManager() {
         return history;
     }
 
+    function defaultParsePath(path) {
+        let partialPath = {};
+
+        if (path) {
+            let hashIndex = path.indexOf("#");
+            if (hashIndex >= 0) {
+                partialPath.hash = path.substr(hashIndex);
+                path = path.substr(0, hashIndex);
+            }
+
+            let searchIndex = path.indexOf("?");
+            if (searchIndex >= 0) {
+                partialPath.search = path.substr(searchIndex);
+                path = path.substr(0, searchIndex);
+            }
+
+            if (path) {
+                partialPath.pathname = path;
+            }
+        }
+
+        return partialPath;
+    }
+
     function defaultPush(to, state = {}){
 
         let { pathname, search, hash } = window.location;
@@ -105,7 +105,7 @@ function createHistoryManager() {
             pathname,
             search,
             hash,
-            ...(typeof to === "string" ? parsePath(to) : to),
+            ...(typeof to === "string" ? history.parsePath(to) : to),
         }
 
         const url = createHref(newLocation)
@@ -185,6 +185,10 @@ function createHistoryManager() {
         push: {
             ...defaultDescriptor,
             value: defaultPush
+        },
+        parsePath: {
+            ...defaultDescriptor,
+            value: defaultParsePath
         }
     })
 

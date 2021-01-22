@@ -12,8 +12,8 @@ function createDefaultContentManager(p = {}) {
 
     function getTitle(wapp) {
         const {response} = wapp;
-        const settings = wapp.getTargetObject().settings;
-        const {siteName = "Wapplr"} = settings;
+        const config = wapp.getTargetObject().config;
+        const {siteName = "Wapplr"} = config;
         const {state} = response;
         const res = (state && state.res) ? state.res : response;
         const {statusCode, statusMessage, errorMessage} = res;
@@ -43,16 +43,16 @@ function createDefaultContentManager(p = {}) {
         description: {
             ...defaultDescriptor,
             value: function description() {
-                const settings = wapp.getTargetObject().settings;
-                const {description} = settings;
+                const config = wapp.getTargetObject().config;
+                const {description} = config;
                 return (description) ? description : getTitle(wapp).split(" | ")[0];
             },
         },
         author: {
             ...defaultDescriptor,
             value: function author() {
-                const settings = wapp.getTargetObject().settings;
-                const {author, siteName = "Wapplr"} = settings;
+                const config = wapp.getTargetObject().config;
+                const {author, siteName = "Wapplr"} = config;
                 return (author) ? author : siteName;
             }
         }

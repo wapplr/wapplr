@@ -7,7 +7,7 @@ export default function serveStatic (publicPath) {
     return function staticMiddleware(req, res, next) {
 
         // parse URL
-        const parsedUrl = url.parse(req.url);
+        const parsedUrl = url.parse(req.wapp.request.url);
 
         // extract URL path
         // Avoid https://en.wikipedia.org/wiki/Directory_traversal_attack
@@ -27,9 +27,9 @@ export default function serveStatic (publicPath) {
         try {
             const data = fs.readFileSync(pathname);
             const stats = fs.statSync(pathname);
-            res.status(200)
+            res.wapp.response.status(200)
 
-            res.sendData = {
+            res.wapp.response.sendData = {
                 data,
                 stats,
                 parsedPath: paredSanitizePath
@@ -38,7 +38,7 @@ export default function serveStatic (publicPath) {
             const stream = fs.createReadStream(pathname)
 
             stream.on("error", function onerror (err) {
-                res.status(err.statusCode || 500, err);
+                res.wapp.response.status(err.statusCode || 500, err);
                 res.wapp.log(err, req, res);
                 next(err)
             })
@@ -51,7 +51,7 @@ export default function serveStatic (publicPath) {
             });
 
         } catch (err) {
-            res.status(err.statusCode || 500, err)
+            res.wapp.response.status(err.statusCode || 500, err)
             res.wapp.log(err, req, res);
             next(err)
         }

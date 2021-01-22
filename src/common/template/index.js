@@ -5,7 +5,7 @@ export default function template(p = {}) {
 
     const {wapp, children, footerMenu = [{name: "HOME", href:"/"}, {name: "404", href:"/404"}, {name: "500", href:"/500"}, {name: "EXTERNAL", href:"https://google.com", target:"_blank"}], logo = wapplrLogo} = p;
     const {styles} = wapp;
-    const {siteName = "Wapplr"} = wapp.settings;
+    const {siteName = "Wapplr"} = wapp.config;
     const copyright = `${siteName} ${new Date().getFullYear()} ©`;
 
     const serverRender = (typeof window === "undefined");
@@ -28,7 +28,7 @@ export default function template(p = {}) {
                             ${footerMenu.map(function (menu) {
                                 const target = menu.target || "self";
                                 const noreferrer = (target === "_blank") ? ' rel="noreferrer"' : "";
-                                return '<div><a class="'+style.button+'"  target="'+target+'" href="'+menu.href+'"'+noreferrer+'>'+menu.name+'</a></div>'
+                                return '<div><a class="'+style.button+'"  target="'+target+'" href="'+menu.href+'" wapplronclicklistener=""'+noreferrer+'>'+menu.name+'</a></div>'
                             }).join("")}
                         </div>
                         <div class="${style.copyright}">

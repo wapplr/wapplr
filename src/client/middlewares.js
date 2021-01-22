@@ -1,6 +1,6 @@
-import {mergeProperties, defaultDescriptor} from '../common/utils'
-import commonMiddlewares from '../common/middlewares';
-import style from '../common/template/template.css';
+import {mergeProperties, defaultDescriptor} from "../common/utils"
+import commonMiddlewares from "../common/middlewares";
+import style from "../common/template/template.css";
 
 export function createRenderMiddleware(p = {}) {
 
@@ -8,12 +8,10 @@ export function createRenderMiddleware(p = {}) {
 
     async function defaultRenderHandle(req, res, next){
 
-        const wapp = renderMiddleware.wapp;
-
         if (wapp.response.content && !wapp.response.content.renderType) {
 
-            res.status(wapp.response.statusCode || 200);
-            res.send(renderMiddleware.render());
+            res.wapp.response.status(wapp.response.statusCode || 200);
+            res.wapp.response.send(renderMiddleware.render());
             next();
 
         } else {
@@ -109,8 +107,7 @@ export function createUpdateTagsMiddleware(p = {}) {
     const {wapp} = p;
 
     function defaultHandle(req, res, next){
-
-        if (res.headersSent){
+        if (res.wapp.response.sended){
 
             function updateTag(tagName, keyName, keyValue, attrName, attrValue) {
                 const node = document.head.querySelector(`${tagName}[${keyName}="${keyValue}"]`);
@@ -122,7 +119,7 @@ export function createUpdateTagsMiddleware(p = {}) {
                     node.parentNode.removeChild(node);
                 }
 
-                if (typeof attrValue === 'string') {
+                if (typeof attrValue === "string") {
                     const nextNode = document.createElement(tagName);
                     nextNode.setAttribute(keyName, keyValue);
                     nextNode.setAttribute(attrName, attrValue);
@@ -131,29 +128,11 @@ export function createUpdateTagsMiddleware(p = {}) {
             }
 
             function updateMeta(name, content) {
-                updateTag('meta', 'name', name, 'content', content);
+                updateTag("meta", "name", name, "content", content);
             }
 
-            function addClickToATags() {
-                const tags = document.querySelectorAll("a");
-                Array.prototype.map.call( tags, function (tag) {
-                    const href = tag.getAttribute("href");
-                    const target = tag.getAttribute("target");
-
-                    if (target === "_blank" || (href && href.slice(0,7) === "http://") || (href && href.slice(0,8) === "https://")) {
-
-                    } else {
-                        tag.onclick = function (e) {
-                            e.preventDefault();
-                            tagsMiddleware.wapp.client.history.push(href);
-                        }
-                    }
-                });
-            }
-
-            const wapp = tagsMiddleware.wapp;
-            const settings = wapp.client.settings;
-            const {siteName = "Wapplr"} = settings;
+            const config = wapp.client.config;
+            const {siteName = "Wapplr"} = config;
             const {state, content = {}} = wapp.response;
             const res = (state && state.res) ? state.res : wapp.response;
             const {statusCode} = res;
@@ -171,14 +150,11 @@ export function createUpdateTagsMiddleware(p = {}) {
 
             document.title = title;
 
-            updateMeta('description', description);
-            updateMeta('author', author);
-            addClickToATags();
+            updateMeta("description", description);
+            updateMeta("author", author);
 
         }
-
         next();
-
     }
 
     const tagsMiddlewareProperties = Object.create(Object.prototype, {
@@ -203,6 +179,59 @@ export function createUpdateTagsMiddleware(p = {}) {
 
 }
 
+export function createAddOnClickToATagsMiddleware(p = {}) {
+
+    const {wapp} = p;
+
+    function defaultHandle(req, res, next){
+        if (res.wapp.response.sended){
+
+            const tags = document.querySelectorAll("a");
+            Array.prototype.map.call( tags, function (tag) {
+                const href = tag.getAttribute("href");
+                const target = tag.getAttribute("target");
+                const enable = (typeof tag.getAttribute("wapplronclicklistener") == "string");
+
+                if (target === "_blank" || (href && href.slice(0,7) === "http://") || (href && href.slice(0,8) === "https://")) {
+
+                } else {
+                    if (!tag._onclickListener && enable) {
+                        tag._onclickListener = function (e) {
+                            e.preventDefault();
+                            wapp.client.history.push({search:"", href:"", ...wapp.client.history.parsePath(href)});
+                        };
+                        tag.addEventListener("click", tag._onclickListener, false);
+                        tag.removeAttribute("wapplronclicklistener");
+                    }
+                }
+            });
+
+        }
+        next();
+    }
+
+    const onClickMiddlewareProperties = Object.create(Object.prototype, {
+        handle: {
+            ...defaultDescriptor,
+            value: defaultHandle
+        },
+    })
+
+    function onClickMiddleware(req, res, next) {
+        if (typeof onClickMiddleware.handle === "function"){
+            onClickMiddleware.handle(req, res, next);
+        }
+        return onClickMiddleware;
+    }
+
+    mergeProperties(onClickMiddleware, onClickMiddlewareProperties);
+
+    Object.defineProperty(onClickMiddleware, "wapp", {...defaultDescriptor, writable: false, enumerable: false, value: wapp});
+
+    return onClickMiddleware;
+
+}
+
 export default function createMiddlewares(p) {
 
     const {log, ...rest} = commonMiddlewares(p);
@@ -211,6 +240,7 @@ export default function createMiddlewares(p) {
         ...rest,
         render: createRenderMiddleware(p),
         tags: createUpdateTagsMiddleware(p),
+        onClick: createAddOnClickToATagsMiddleware(p),
         log
     }
 }

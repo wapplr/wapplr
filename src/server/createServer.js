@@ -74,7 +74,7 @@ export default function createServer(p = {}) {
         }
     })
 
-    const defaultSettings = Object.create(Object.prototype, {
+    const defaultConfig = Object.create(Object.prototype, {
         port: {
             ...defaultDescriptor,
             value: port
@@ -103,8 +103,8 @@ export default function createServer(p = {}) {
         },
     })
 
-    mergeProperties(defaultSettings, wapp.settings);
-    mergeProperties(defaultSettings, rest);
+    mergeProperties(defaultConfig, wapp.config);
+    mergeProperties(defaultConfig, rest);
 
     const defaultServers = Object.create(Object.prototype, {
         "80": {
@@ -115,7 +115,7 @@ export default function createServer(p = {}) {
 
     function defaultListen() {
 
-        const {port, portSSL, credentials} = wapplrServer.settings;
+        const {port, portSSL, credentials} = wapplrServer.config;
         const {key, cert} = credentials;
 
         let httpServer = (port) ? wapplrServer.servers[port] : null;
@@ -194,10 +194,10 @@ export default function createServer(p = {}) {
     const defaultMiddlewares = createMiddlewares({wapp, ...p});
 
     const wapplrServer = Object.create(Object.prototype, {
-        settings: {
+        config: {
             ...defaultDescriptor,
             writable: false,
-            value: defaultSettings
+            value: defaultConfig
         },
         listen: {
             ...defaultDescriptor,
@@ -225,18 +225,18 @@ export default function createServer(p = {}) {
     Object.defineProperty(wapplrServer, "wapp", {...defaultDescriptor, writable: false, enumerable: false, value: wapp});
     Object.defineProperty(wapp, "server", {...defaultDescriptor, value: wapplrServer});
 
-    if (wapplrServer.settings.publicPath) {
+    if (wapplrServer.config.publicPath) {
         const {wapp, ...rest} = wapplrServer.middlewares;
         wapplrServer.middlewares = {
             wapp: wapplrServer.middlewares.wapp,
-            "static": app.static(wapplrServer.settings.publicPath),
+            "static": app.static(wapplrServer.config.publicPath),
             ...rest
         }
     }
 
     app.use(async function defaultMiddlewaresWrapper(req, res, out) {
 
-        if (!wapplrServer.settings.disableUseDefaultMiddlewares){
+        if (!wapplrServer.config.disableUseDefaultMiddlewares){
 
             const middlewares = Object.keys(wapplrServer.middlewares).map(function (key) { return wapplrServer.middlewares[key] })
             let index = 0;
@@ -250,7 +250,7 @@ export default function createServer(p = {}) {
                     try {
                         return await func(...args)
                     } catch (e) {
-                        res.status(500, e);
+                        res.wapp.response.status(500, e);
                         return await next(e)
                     }
                 } else if (typeof out === "function") {

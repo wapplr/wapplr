@@ -11,12 +11,10 @@ export default function createLog({wapp}) {
     function defaultRender(p = {}) {
 
         const {wapp, parent = template, logo = wapplrLogo} = p;
+
         const {request, response, styles} = wapp;
-        const {state} = response;
-        const res = (state && state.res) ? state.res : response;
-        const req = (state && state.req) ? state.req : request;
-        const {remoteAddress, httpVersion, method, url, timestamp} = req;
-        const {statusCode = 200, statusMessage = "", errorMessage = ""} = res;
+        const {remoteAddress, httpVersion, method, url, timestamp} = request;
+        const {statusCode = 200, statusMessage = "", errorMessage = ""} = response;
 
         const text = p.text || `[LOG] [${timestamp} - ${remoteAddress}] HTTP:${httpVersion} ${method} ${url || "/"} -> [${statusCode}] ${errorMessage || statusMessage}`;
 
@@ -25,7 +23,7 @@ export default function createLog({wapp}) {
         const renderedLog = `
             <div class="${style.log}">
                 <div class="${style.logo}">
-                    ${logo({wapp})}
+                    ${(logo) ? logo({wapp}) : ""}
                 </div>
                 <div>${text}</div>
             </div>`
@@ -60,23 +58,16 @@ export default function createLog({wapp}) {
             next = d;
         }
 
-        const { httpVersion, method, url } = req;
-        const remoteAddress = req.remoteAddress || ((req.headers && req.headers['x-forwarded-for']) || '').split(',').pop().trim() || (req.socket && req.socket.remoteAddress) || "::1";
-        const { statusCode = ""} = res;
-        let statusMessage;
-
-        const http1 = (req.httpVersion === "1.1" || (req.httpVersion && Number(req.httpVersion.split(".")[0]) === 1))
-
-        if (http1) {
-            statusMessage = res.statusMessage || "";
-        } else {
-            const response = res.wapp.response || {};
-            const {state = {}} = response;
-            const wapplrRes = state.res || response;
-            statusMessage = wapplrRes.statusMessage || "";
+        if (req){
+            req = req.wapp.request;
         }
 
-        const timestamp = req.timestamp || Date.now();
+        if (res){
+            res = res.wapp.response;
+        }
+
+        const { httpVersion, method, url, remoteAddress, timestamp = Date.now() } = req;
+        const { statusCode = "", statusMessage = "" } = res;
 
         const errorMessage = (error && error.stack) ? error.stack : (error && error.message) ? error.message : (typeof error == "string") ? error : "";
 

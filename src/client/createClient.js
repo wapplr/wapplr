@@ -15,15 +15,15 @@ export default function createClient(p = {}) {
 
     const {disableUseDefaultMiddlewares = false, ...rest} = clientConfig;
 
-    const defaultSettings = Object.create(Object.prototype, {
+    const defaultConfig = Object.create(Object.prototype, {
         disableUseDefaultMiddlewares: {
             ...defaultDescriptor,
             value: disableUseDefaultMiddlewares
         },
     })
 
-    mergeProperties(defaultSettings, wapp.settings);
-    mergeProperties(defaultSettings, rest);
+    mergeProperties(defaultConfig, wapp.config);
+    mergeProperties(defaultConfig, rest);
 
     const app = createApp({wapp})
     const history = createHistory({wapp})
@@ -55,10 +55,10 @@ export default function createClient(p = {}) {
     const defaultMiddlewares = createMiddlewares({wapp, ...p});
 
     const wapplrClient = Object.create(Object.prototype, {
-        settings: {
+        config: {
             ...defaultDescriptor,
             writable: false,
-            value: defaultSettings
+            value: defaultConfig
         },
         listen: {
             ...defaultDescriptor,
@@ -87,7 +87,7 @@ export default function createClient(p = {}) {
 
     app.use(async function defaultMiddlewaresWrapper(req, res, out) {
 
-        if (!wapplrClient.settings.disableUseDefaultMiddlewares){
+        if (!wapplrClient.config.disableUseDefaultMiddlewares){
 
             const middlewares = Object.keys(wapplrClient.middlewares).map(function (key) { return wapplrClient.middlewares[key] })
             let index = 0;
@@ -101,7 +101,7 @@ export default function createClient(p = {}) {
                     try {
                         return await func(...args)
                     } catch (e) {
-                        res.status(500, e);
+                        res.wapp.response.status(500, e);
                         return await next(e)
                     }
                 } else if (typeof out === "function") {

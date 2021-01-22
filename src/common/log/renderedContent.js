@@ -21,7 +21,7 @@ function getStyle(p) {
 }
 
 function getContent(p) {
-    const {templateStyle, logStyle, text, copyright, toConsole, logo, footerMenu, } = p;
+    const {templateStyle, logStyle, text, copyright, toConsole, logo, footerMenu} = p;
 
     return `<div class="${templateStyle.page}">
                 <div class="${templateStyle.header}">
@@ -63,7 +63,7 @@ function getContent(p) {
 
 function getHtml(p) {
 
-    const {title = "", style, content, templateStyle} = p;
+    const {title, style, content, templateStyle} = p;
 
     return `<html lang="en">
     <head>

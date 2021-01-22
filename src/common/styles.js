@@ -167,9 +167,9 @@ export default function createStyleManager(p = {}) {
 
     function defaultHandle(req, res, next){
         const targetObject = (wapp.getTargetObject) ? wapp.getTargetObject() : wapp;
-        if (!targetObject.settings ||
-            (targetObject.settings && !targetObject.settings.styles) ||
-            (targetObject.settings && targetObject.settings.styles && !targetObject.settings.styles.disableClearStyles)){
+        if (!targetObject.config ||
+            (targetObject.config && !targetObject.config.styles) ||
+            (targetObject.config && targetObject.config.styles && !targetObject.config.styles.disableClearStyles)){
             stylesMiddleware.styleManager.clear();
         }
         next();

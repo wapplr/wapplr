@@ -223,18 +223,19 @@ export default function createRouter(p = {}) {
     async function defaultHandle(req, res, next){
 
         const routerRes = routerMiddleware.routeManager.resolve;
-        const path = wapp.response.req.path || wapp.response.req.url;
+        const path = wapp.request.req.path || wapp.request.req.url;
+
         const route = await routerRes({path});
 
-        wapp.response.statusCode = (res.statusCode === 200 || !res.statusCode) ? route.status : res.statusCode;
+        wapp.response.statusCode = (wapp.response.statusCode === 200 || !wapp.response.statusCode) ? route.status : wapp.response.statusCode;
         wapp.response.route = route;
         wapp.response.content = route.content;
 
         if (wapp.response.statusCode) {
-            res.status(wapp.response.statusCode);
+            res.wapp.response.status(wapp.response.statusCode);
         }
 
-        if (req.path === "/500" && wapp.response.statusCode === 404) {
+        if (wapp.request.path === "/500" && wapp.response.statusCode === 404) {
             //test an error
             wapp.response.route.contentName = "";
             throw new Error("Internal Server Error (Test)")

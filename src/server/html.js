@@ -2,7 +2,7 @@ import style from "../common/template/template.css";
 
 export default function html(wapp) {
 
-    const settings = wapp.server.settings;
+    const config = wapp.server.config;
     const {
         siteName = "Wapplr",
         assets = {},
@@ -12,7 +12,7 @@ export default function html(wapp) {
         manifest="/manifest.json",
         icon="data:image/png;base64,iVBORw0KGgo=",
         appleTouchIcon,
-    } = settings;
+    } = config;
 
     const {state, content = {}} = wapp.response;
     const res = (state && state.res) ? state.res : wapp.response;

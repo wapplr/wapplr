@@ -7,7 +7,7 @@ export default function createApp(p = {}) {
 
     const {wapp} = p;
 
-    const defaultSettings = Object.create(Object.prototype, {})
+    const defaultConfig = Object.create(Object.prototype, {})
 
     const defaultMiddlewares = [
         function next(req, res, next) {
@@ -34,8 +34,8 @@ export default function createApp(p = {}) {
             return;
         }
 
-        const settings = wapp.server.settings;
-        const {siteName = "Wapplr"} = settings;
+        const config = wapp.server.config;
+        const {siteName = "Wapplr"} = config;
 
         const renderedContent = wapp.log.renderedContent({
             title: err.message + " | " + siteName,
@@ -126,10 +126,10 @@ export default function createApp(p = {}) {
     }
 
     const appProperties = Object.create(Object.prototype, {
-        settings: {
+        config: {
             ...defaultDescriptor,
             writable: false,
-            value: defaultSettings
+            value: defaultConfig
         },
         middlewares: {
             ...defaultDescriptor,

@@ -9,7 +9,7 @@ export default function createWapp(p = {}) {
 
     const {containerElementId, appStateName, siteName, description, lang, ...rest} = commonConfig;
 
-    const defaultSettings = Object.create(Object.prototype, {
+    const defaultConfig = Object.create(Object.prototype, {
         containerElementId: {
             ...defaultDescriptor,
             value: containerElementId
@@ -32,7 +32,7 @@ export default function createWapp(p = {}) {
         }
     })
 
-    mergeProperties(defaultSettings, rest);
+    mergeProperties(defaultConfig, rest);
 
     const defaultGlobals = Object.create(Object.prototype, {
         DEV: {
@@ -158,10 +158,10 @@ export default function createWapp(p = {}) {
     };
 
     const wapp = Object.create(Object.prototype, {
-        settings: {
+        config: {
             ...defaultDescriptor,
             writable: false,
-            value: defaultSettings
+            value: defaultConfig
         },
         globals: {
             ...defaultDescriptor,
@@ -180,12 +180,10 @@ export default function createWapp(p = {}) {
         },
         response: {
             ...defaultDescriptor,
-            writable: false,
             value: Object.create(Object.prototype, defaultResponseProperties)
         },
         request: {
             ...defaultDescriptor,
-            writable: false,
             value: Object.create(Object.prototype, defaultRequestProperties)
         },
         defaultResponse: {
@@ -202,34 +200,18 @@ export default function createWapp(p = {}) {
         },
         resetResponse: {
             ...defaultDescriptor,
-            writable: false,
             enumerable: false,
             value: function () {
-                const t = this;
-                Object.keys(t.defaultResponse).forEach(function (key){
-                    t.response[key] = t.defaultResponse[key];
-                })
-                Object.keys(t.response).forEach(function (key){
-                    if (typeof t.defaultResponse[key] == "undefined") {
-                        delete t.response[key]
-                    }
-                })
+                this.response = mergeProperties({}, this.defaultResponse)
+                return this.response;
             }
         },
         resetRequest: {
             ...defaultDescriptor,
-            writable: false,
             enumerable: false,
             value: function () {
-                const t = this;
-                Object.keys(t.defaultRequest).forEach(function (key){
-                    t.request[key] = t.defaultRequest[key];
-                })
-                Object.keys(t.request).forEach(function (key){
-                    if (typeof t.defaultRequest[key] == "undefined") {
-                        delete t.request[key]
-                    }
-                })
+                this.request = mergeProperties({}, this.defaultRequest)
+                return this.request;
             }
         }
     });
