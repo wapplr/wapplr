@@ -1,35 +1,3 @@
-body {
-    margin: 0;
-    padding: 0;
-    max-width: 100vw;
-    overflow-x: hidden;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-.app {
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: rgba(0,0,0,0.87);
-    min-height: 100vh;
-    max-width: 100vw;
-    display: block;
-    position: relative;
-    overflow-x: hidden;
-}
-
-div.app > * {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-@media (orientation: portrait) {
-    .app {
-        max-width: 100vh;
-    }
-}
-
 .page {
     display: block;
     position: relative;

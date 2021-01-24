@@ -8,10 +8,12 @@ export function createRenderMiddleware(p = {}) {
 
     async function defaultRenderHandle(req, res, next){
 
-        if (wapp.response.content && !wapp.response.content.renderType) {
+        const wappResponse = res.wappResponse;
 
-            res.wapp.response.status(wapp.response.statusCode || 200);
-            res.wapp.response.send(renderMiddleware.render());
+        if (wappResponse.content && !wappResponse.content.renderType) {
+
+            res.wappResponse.status(wappResponse.statusCode || 200);
+            res.wappResponse.send(renderMiddleware.render({wapp, req, res}));
             next();
 
         } else {
@@ -43,11 +45,12 @@ export function createRenderMiddleware(p = {}) {
 
     }
 
-    function defaultRender() {
-        const {content = {}} = wapp.response;
+    function defaultRender({wapp, req, res}) {
+        const wappResponse = res.wappResponse;
+        const {content = {}} = wappResponse;
         let {render = ""} = content;
         if (typeof render === "function") {
-            render = render(wapp);
+            render = render({wapp, req, res});
         }
 
         wapp.styles.use(style);
@@ -107,7 +110,7 @@ export function createUpdateTagsMiddleware(p = {}) {
     const {wapp} = p;
 
     function defaultHandle(req, res, next){
-        if (res.wapp.response.sended){
+        if (res.wappResponse.sended){
 
             function updateTag(tagName, keyName, keyValue, attrName, attrValue) {
                 const node = document.head.querySelector(`${tagName}[${keyName}="${keyValue}"]`);
@@ -133,19 +136,17 @@ export function createUpdateTagsMiddleware(p = {}) {
 
             const config = wapp.client.config;
             const {siteName = "Wapplr"} = config;
-            const {state, content = {}} = wapp.response;
-            const res = (state && state.res) ? state.res : wapp.response;
-            const {statusCode} = res;
+            const {content = {}, statusCode} = res.wappResponse;
 
             let {title = "", description = "", author = ""} = content;
 
-            if (typeof title === "function") {title = title(wapp);}
+            if (typeof title === "function") {title = title({wapp, req, res});}
             title = `${(title) ? title : (statusCode === 404) ? "Not Found | " + siteName : "Untitled Page | " + siteName }`;
 
-            if (typeof description === "function") {description = description(wapp)}
+            if (typeof description === "function") {description = description({wapp, req, res})}
             description = (description) ? description : (title && title.split) ? title.split(" | ")[0] : title;
 
-            if (typeof author === "function") {author = author(wapp)}
+            if (typeof author === "function") {author = author({wapp, req, res})}
             author = (author || siteName)
 
             document.title = title;
@@ -184,7 +185,7 @@ export function createAddOnClickToATagsMiddleware(p = {}) {
     const {wapp} = p;
 
     function defaultHandle(req, res, next){
-        if (res.wapp.response.sended){
+        if (res.wappResponse.sended){
 
             const tags = document.querySelectorAll("a");
             Array.prototype.map.call( tags, function (tag) {

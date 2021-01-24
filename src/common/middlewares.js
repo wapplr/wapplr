@@ -10,7 +10,18 @@ function createWappMiddleware(p = {}) {
 
     const {wapp} = p;
 
-    function defaultHandle(req, res, next){
+    function defaultAddHandle(obj) {
+        if (typeof obj === "object" && !obj.length){
+            Object.keys(obj).forEach(function (handleName) {
+                const handle = obj[handleName];
+                if (typeof handle == "function") {
+                    wappMiddleware.handles[handleName] = handle
+                }
+            })
+        }
+    }
+
+    function defaultWappMiddleware(req, res, next) {
 
         const globals = wapp.globals;
         const {DEV} = globals;
@@ -40,61 +51,127 @@ function createWappMiddleware(p = {}) {
             res.container = container;
         }
 
-        wapp.resetRequest();
-        wapp.resetResponse();
+        const wappRequest = {};
+        const wappResponse = {};
 
-        wapp.request.timestamp = req.timestamp;
-        wapp.request.path = req.path;
-        wapp.request.url = req.url;
-        wapp.request.method = req.method;
-        wapp.request.httpVersion = req.httpVersion;
-        wapp.request.hostname = (req.headers && req.headers.host) ? req.headers.host : req.hostname;
-        wapp.request.protocol = req.protocol;
-        wapp.request.secure = req.secure;
-        wapp.request.remoteAddress = req.remoteAddress;
-        wapp.request.userAgent = (req.headers && req.headers["user-agent"]) ? req.headers["user-agent"] : (typeof window !== "undefined" && window.navigator) ? window.navigator.userAgent : ""
-        wapp.request.req = req;
-        wapp.request.res = res;
+        wappRequest.timestamp = req.timestamp;
+        wappRequest.path = req.path;
+        wappRequest.url = req.url;
+        wappRequest.method = req.method;
+        wappRequest.httpVersion = req.httpVersion;
+        wappRequest.hostname = (req.headers && req.headers.host) ? req.headers.host : req.hostname;
+        wappRequest.protocol = req.protocol;
+        wappRequest.secure = req.secure;
+        wappRequest.remoteAddress = req.remoteAddress;
+        wappRequest.userAgent = (req.headers && req.headers["user-agent"]) ? req.headers["user-agent"] : (typeof window !== "undefined" && window.navigator) ? window.navigator.userAgent : ""
 
-        wapp.response.statusCode = res.statusCode;
-        wapp.response.containerElementId = containerElementId;
-        wapp.response.appStateName = appStateName;
-        wapp.response.container = container;
-        wapp.response.req = req;
-        wapp.response.res = res;
+        Object.defineProperty(wappRequest, "wapp", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: wapp
+        })
 
-        req.wapp = wapp;
-        res.wapp = wapp;
+        Object.defineProperty(wappRequest, "req", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: req
+        })
 
-        wapp.response.status = wapp.response.status || function status(...attributes) {
+        Object.defineProperty(wappRequest, "res", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: res
+        })
 
-            if (!wapp.response.sended) {
+        wappResponse.statusCode = res.statusCode;
+        wappResponse.containerElementId = containerElementId;
+        wappResponse.appStateName = appStateName;
+        wappResponse.container = container;
 
-                const http1 = (wapp.request.httpVersion === "1.1" || (wapp.request.httpVersion && Number(wapp.request.httpVersion.split(".")[0]) === 1))
-                const tempStatusCode = wapp.response.statusCode;
-                const tempStatusMessage = wapp.response.statusMessage;
+        Object.defineProperty(wappResponse, "wapp", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: wapp
+        })
+
+        Object.defineProperty(wappResponse, "req", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: req
+        })
+
+        Object.defineProperty(wappResponse, "res", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: res
+        })
+
+
+
+        Object.defineProperty(req, "wapp", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: wapp
+        })
+
+        Object.defineProperty(req, "wappRequest", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: wappRequest
+        })
+
+
+        Object.defineProperty(res, "wapp", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: wapp
+        })
+
+        Object.defineProperty(res, "wappResponse", {
+            ...defaultDescriptor,
+            enumerable: false,
+            writable: false,
+            value: wappResponse
+        })
+
+        wappResponse.status = function status(...attributes) {
+
+            if (!wappResponse.sended) {
+
+                const http1 = (wappRequest.httpVersion === "1.1" || (wappRequest.httpVersion && Number(wappRequest.httpVersion.split(".")[0]) === 1))
+                const tempStatusCode = wappResponse.statusCode;
+                const tempStatusMessage = wappResponse.statusMessage;
 
                 const statusCode = attributes[0];
                 const error = attributes[1];
                 const isError = !!(error && error.message && error.stack);
 
-                wapp.response.statusCode = statusCode
+                wappResponse.statusCode = statusCode
 
                 if (statusCode) {
                     if (statusCode === 200) {
-                        wapp.response.statusMessage = (tempStatusCode === 200 && tempStatusMessage) ? tempStatusMessage : "OK";
+                        wappResponse.statusMessage = (tempStatusCode === 200 && tempStatusMessage) ? tempStatusMessage : "OK";
                     }
                     if (statusCode === 304) {
-                        wapp.response.statusMessage = (tempStatusCode === 304 && tempStatusMessage) ? tempStatusMessage : "Not modified";
+                        wappResponse.statusMessage = (tempStatusCode === 304 && tempStatusMessage) ? tempStatusMessage : "Not modified";
                     }
                     if (statusCode === 404) {
-                        wapp.response.statusMessage = (tempStatusCode === 404 && tempStatusMessage) ? tempStatusMessage : "Not found";
+                        wappResponse.statusMessage = (tempStatusCode === 404 && tempStatusMessage) ? tempStatusMessage : "Not found";
                     }
                     if (statusCode === 500) {
-                        wapp.response.statusMessage = (isError && error.message) ? error.name + ": " + error.message : (tempStatusCode === 500 && tempStatusMessage) ? tempStatusMessage : "Error: Internal Server Error";
+                        wappResponse.statusMessage = (isError && error.message) ? error.name + ": " + error.message : (tempStatusCode === 500 && tempStatusMessage) ? tempStatusMessage : "Error: Internal Server Error";
                     }
                     if (http1) {
-                        res.statusMessage = wapp.response.statusMessage;
+                        res.statusMessage = wappResponse.statusMessage;
                     }
                 }
 
@@ -104,49 +181,75 @@ function createWappMiddleware(p = {}) {
 
         }
 
-        wapp.response.send = wapp.response.send || function send(...attributes) {
-            if (!wapp.response.sended) {
+        wappResponse.send = function send(...attributes) {
+            if (!wappResponse.sended) {
                 const [html, ...restAttr] = attributes;
-                wapp.response.sendData = {
+                wappResponse.sendData = {
                     data: html
                 }
                 wappMiddleware.runSendMiddlewares(req, res, function next() {
-                    const endHtml = wapp.response.sendData?.data || "";
+                    const endHtml = wappResponse.sendData?.data || "";
                     res.send(...[endHtml, ...restAttr]);
-                    wapp.response.sended = true;
+                    wappResponse.sended = true;
                 });
             }
         }
 
-        if (!res._originalEndFunction){
-            Object.defineProperty(res, "_originalEndFunction", {
-                enumerable: false,
-                writable: false,
-                configurable: false,
-                value: res.end
-            })
-            res.end = function (...attributes) {
-                res._originalEndFunction(...attributes);
-                wapp.response.sended = true;
+        Object.defineProperty(res, "_originalEndFunction", {
+            enumerable: false,
+            writable: false,
+            configurable: false,
+            value: res.end
+        })
+
+        res.end = function (...attributes) {
+            res._originalEndFunction(...attributes);
+            wappResponse.sended = true;
+        }
+
+        Object.defineProperty(res, "_originalStatusFunction", {
+            enumerable: false,
+            writable: false,
+            configurable: false,
+            value: res.status
+        })
+
+        res.status = function (...attributes) {
+            if (!wappResponse.sended) {
+                res._originalStatusFunction(...attributes);
             }
         }
 
-        if (!res._originalStatusFunction){
-            Object.defineProperty(res, "_originalStatusFunction", {
-                enumerable: false,
-                writable: false,
-                configurable: false,
-                value: res.status
-            })
-            res.status = function (...attributes) {
-                if (!wapp.response.sended) {
-                    res._originalStatusFunction(...attributes);
-                }
-            }
+        if (wapp.globals.DEV){
+            wapp.wappResponse = wappResponse
+            wapp.wappRequest = wappRequest
         }
 
-        next();
+        next()
 
+    }
+
+    function defaultHandle(req, res, out){
+
+        const handles = Object.keys(wappMiddleware.handles).sort().map(function (key) {return wappMiddleware.handles[key]})
+
+        let index = 0;
+
+        function next(err) {
+
+            if (handles[index]){
+                const func = handles[index];
+                index = index + 1;
+                return func(req, res, (err) ? function(){next(err)} : next)
+            } else if (typeof out === "function") {
+                index = 0;
+                return out(err);
+            }
+
+            return null;
+        }
+
+        return next();
     }
 
     function defaultRunSendMiddlewares(req, res, out) {
@@ -186,6 +289,16 @@ function createWappMiddleware(p = {}) {
             ...defaultDescriptor,
             value: defaultHandle
         },
+        addHandle: {
+            ...defaultDescriptor,
+            value: defaultAddHandle
+        },
+        handles: {
+            ...defaultDescriptor,
+            value: {
+                create: defaultWappMiddleware
+            }
+        },
         addSendMiddleware: {
             ...defaultDescriptor,
             value: defaultAddSendMiddleware,
@@ -211,7 +324,7 @@ function createWappMiddleware(p = {}) {
 
     Object.defineProperty(wappMiddleware, "wapp", {...defaultDescriptor, writable: false, enumerable: false, value: wapp});
 
-    Object.defineProperty(wapp, "wappMiddleware", {...defaultDescriptor, writable: false, value: wappMiddleware});
+    Object.defineProperty(wapp, "middleware", {...defaultDescriptor, writable: false, value: wappMiddleware});
 
     return wappMiddleware
 

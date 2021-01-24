@@ -10,13 +10,10 @@ function createDefaultContentManager(p = {}) {
         return (contentName && contents[contentName]) ? {...contents[contentName]} : null
     }
 
-    function getTitle(wapp) {
-        const {response} = wapp;
+    function getTitle({wapp, req, res}) {
         const config = wapp.getTargetObject().config;
         const {siteName = "Wapplr"} = config;
-        const {state} = response;
-        const res = (state && state.res) ? state.res : response;
-        const {statusCode, statusMessage, errorMessage} = res;
+        const {statusCode, statusMessage, errorMessage} = res.wappResponse;
         let title = "Home";
         if (statusCode === 404) {
             title = statusMessage || "Not found";
@@ -30,27 +27,27 @@ function createDefaultContentManager(p = {}) {
     const defaultContentValues = Object.create(Object.prototype, {
         render: {
             ...defaultDescriptor,
-            value: function render(wapp) {
-                return wapp.log.render({wapp})
+            value: function render({wapp, req, res}) {
+                return wapp.log.render({wapp, req, res})
             },
         },
         title: {
             ...defaultDescriptor,
-            value: function title(wapp) {
-                return getTitle(wapp)
+            value: function title({wapp, req, res}) {
+                return getTitle({wapp, req, res})
             },
         },
         description: {
             ...defaultDescriptor,
-            value: function description() {
+            value: function description({wapp, req, res}) {
                 const config = wapp.getTargetObject().config;
                 const {description} = config;
-                return (description) ? description : getTitle(wapp).split(" | ")[0];
+                return (description) ? description : getTitle({wapp, req, res}).split(" | ")[0];
             },
         },
         author: {
             ...defaultDescriptor,
-            value: function author() {
+            value: function author({wapp, req, res}) {
                 const config = wapp.getTargetObject().config;
                 const {author, siteName = "Wapplr"} = config;
                 return (author) ? author : siteName;
@@ -148,9 +145,9 @@ export default function createContents(p = {}) {
     const {wapp, contentManager = createDefaultContentManager(p)} = p;
 
     function defaultHandle(req, res, next){
-        if (!wapp.response.content) {
+        if (!res.wappResponse.content) {
             const contentRes = contentsMiddleware.contentManager.resolve;
-            wapp.response.content = contentRes(wapp.response.route);
+            res.wappResponse.content = contentRes(res.wappResponse.route);
         }
         return next();
     }
@@ -160,9 +157,6 @@ export default function createContents(p = {}) {
     }
 
     function defaultGet(p) {
-        if (typeof p == "undefined") {
-            return wapp.response.content;
-        }
         return contentsMiddleware.contentManager.get(p)
     }
 

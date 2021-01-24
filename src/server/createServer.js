@@ -250,7 +250,7 @@ export default function createServer(p = {}) {
                     try {
                         return await func(...args)
                     } catch (e) {
-                        res.wapp.response.status(500, e);
+                        res.wappResponse.status(500, e);
                         return await next(e)
                     }
                 } else if (typeof out === "function") {

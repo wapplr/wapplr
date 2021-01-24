@@ -50,15 +50,11 @@ function createDefaultRequestManager(p = {}) {
             fetch = window.fetch;
         }
 
-        if (typeof p == "string") {
-            p = {requestName: p};
-        }
-        const {requestName} = p;
+        const {requestName, req} = p;
 
         const request = (requestName && requestManager.requests[requestName]) ? requestManager.requests[requestName] : (p.request) ? p.request : null
 
         const {url, options = {}} = request;
-        const {req = {}} = wapp.response;
         const {body, getBody} = options;
 
         let requestBody = (typeof getBody == "function") ? getBody({wapp, ...p}) : body;
@@ -70,7 +66,7 @@ function createDefaultRequestManager(p = {}) {
             requestBody = requestBody.replace(/":" /g, '":"');
         }
 
-        const cookie = (req.headers) ? req.headers.cookie : null;
+        const cookie = (req && req.headers) ? req.headers.cookie : null;
         if (cookie) {
             options.headers.cookie = cookie;
         }
@@ -145,15 +141,16 @@ export default function createRequests(p = {}) {
     }
 
     async function defaultSend(p) {
+        const {res} = p;
         const response = await requestManager.sendRequest(p);
-        if (wapp.states.store){
+        if (res && res.wappResponse.store){
             Object.keys(response).forEach(function (requestName) {
-                wapp.states.store.dispatch(wapp.states.stateManager.actions.res({
+                res.wappResponse.store.dispatch(wapp.states.stateManager.actions.res({
                     type: "INS_RES",
                     name: "responses",
                     value: response
                 }));
-                wapp.response.state = wapp.states.store.getState();
+                res.wappResponse.state = res.wappResponse.store.getState();
             })
         }
         return response;

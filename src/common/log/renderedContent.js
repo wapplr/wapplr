@@ -1,6 +1,7 @@
-import defaultTemplateStyle from '../template/template.css';
-import defaultLogoStyle from '../logo/logo.css';
-import defaultLogStyle from './log.css';
+import defaultTemplateStyle from "../template/template.css";
+import defaultAppStyle from "../template/app.css";
+import defaultLogoStyle from "../logo/logo.css";
+import defaultLogStyle from "./log.css";
 
 function getLogo(p) {
     const {logoStyle} = p;
@@ -16,8 +17,8 @@ function getLogo(p) {
 }
 
 function getStyle(p) {
-    const {type, templateStyle, logoStyle, logStyle} = p;
-    return`<style ${(type === "content" ? "scoped" : "")}>${templateStyle._getCss()} ${logoStyle._getCss()} ${logStyle._getCss()} </style>`
+    const {type, templateStyle, appStyle, logoStyle, logStyle} = p;
+    return`<style ${(type === "content" ? "scoped" : "")}>${templateStyle._getCss()} ${appStyle._getCss()} ${logoStyle._getCss()} ${logStyle._getCss()} </style>`
 }
 
 function getContent(p) {
@@ -63,7 +64,7 @@ function getContent(p) {
 
 function getHtml(p) {
 
-    const {title, style, content, templateStyle} = p;
+    const {title, style, content, appStyle} = p;
 
     return `<html lang="en">
     <head>
@@ -76,7 +77,7 @@ function getHtml(p) {
         ${style}
     </head>
     <body>
-        <div class="${templateStyle.app}" id="wapplr-container-element-id-buildHash">
+        <div class="${appStyle.app}" id="wapplr-container-element-id-buildHash">
             ${content}
         </div>
     </body>
@@ -88,6 +89,7 @@ export default function renderedContent(p = {}) {
 
     const {
         templateStyle = defaultTemplateStyle,
+        appStyle = defaultAppStyle,
         logoStyle = defaultLogoStyle,
         logStyle = defaultLogStyle
     } = p;
@@ -103,7 +105,7 @@ export default function renderedContent(p = {}) {
     } = p;
 
     const {
-        style = getStyle({templateStyle, logoStyle, logStyle, ...p}),
+        style = getStyle({templateStyle, appStyle, logoStyle, logStyle, ...p}),
         content = getContent({templateStyle, logStyle, text, copyright, toConsole, logo, footerMenu, ...p})
     } = p;
 
@@ -112,7 +114,7 @@ export default function renderedContent(p = {}) {
     }
 
     const {
-        html = getHtml({title, style, content, templateStyle, ...p})
+        html = getHtml({title, style, content, appStyle, ...p})
     } = p;
 
     return html;

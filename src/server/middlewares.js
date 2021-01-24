@@ -30,13 +30,13 @@ export function createRenderMiddleware(p = {}) {
 
     function defaultRenderHandle(req, res, next){
 
-        const wapp = renderMiddleware.wapp;
+        const wappResponse = res.wappResponse;
 
-        if (wapp.response.content && !wapp.response.content.renderType) {
+        if (wappResponse.content && !wappResponse.content.renderType) {
 
-            res.wapp.response.status(wapp.response.statusCode || 200);
+            res.wappResponse.status(wappResponse.statusCode || 200);
             const render = wapp.contents.getComponent("html");
-            res.wapp.response.send(render(wapp).replace(/>\s+</g, "><"));
+            res.wappResponse.send(render({wapp, req, res}).replace(/>\s+</g, "><"));
 
             next();
 
@@ -140,7 +140,7 @@ export function createNotModifiedMiddleware(p = {}) {
         const lastModified = res.getHeader("last-modified");
 
         const conditionalGet = ifMatch || ifUnmodifiedSince || ifNoneMatch || ifModifiedSince;
-        const isCacheable = ((res.wapp.response.statusCode >= 200 && res.wapp.response.statusCode < 300) || res.wapp.response.statusCode === 304)
+        const isCacheable = ((res.wappResponse.statusCode >= 200 && res.wappResponse.statusCode < 300) || res.wappResponse.statusCode === 304)
         const noCache = (cacheControl && /(?:^|,)\s*?no-cache\s*?(?:,|$)/.test(cacheControl))
         const unconditional = (!ifUnmodifiedSince && !ifNoneMatch)
 
@@ -213,7 +213,7 @@ export function createNotModifiedMiddleware(p = {}) {
         const fromCache = notModifiedMiddleware.isFromCache(req, res);
 
         if (fromCache) {
-            res.wapp.response.status(304);
+            res.wappResponse.status(304);
             res.wapp.log(req, res);
             res.end()
         } else {
@@ -252,12 +252,12 @@ export default function createMiddlewares(p) {
     const {log, ...rest} = commonMiddlewares(p);
 
     const {wapp} = p;
-    const wappMiddleware = wapp.wappMiddleware;
+    const wappMiddleware = wapp.middleware;
     const notModifiedMiddleware = createNotModifiedMiddleware(p);
 
     wappMiddleware.addSendMiddleware({
         headers: function (req, res, next) {
-            const {sendData = {}} = res.wapp.response;
+            const {sendData = {}} = res.wappResponse;
             if (res.setHeader) {
                 const {data, stats = {}, parsedPath = {}} = sendData;
                 let html = data;
@@ -285,7 +285,7 @@ export default function createMiddlewares(p) {
             return next();
         },
         etag: function (req, res, next) {
-            const {sendData = {}} = res.wapp.response;
+            const {sendData = {}} = res.wappResponse;
             if (res.setHeader) {
                 const {stats = {}} = sendData;
                 const {mtime, size} = stats;
@@ -300,7 +300,7 @@ export default function createMiddlewares(p) {
             if (res.setHeader) {
                 const fromCache = notModifiedMiddleware.isFromCache(req, res);
                 if (fromCache) {
-                    res.wapp.response.status(304);
+                    res.wappResponse.status(304);
                     res.wapp.log(req, res);
                     res.end()
                     return;

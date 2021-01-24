@@ -1,6 +1,6 @@
-import style from "../common/template/template.css";
+import style from "../common/template/app.css";
 
-export default function html(wapp) {
+export default function html({wapp, req, res}) {
 
     const config = wapp.server.config;
     const {
@@ -12,24 +12,23 @@ export default function html(wapp) {
         manifest="/manifest.json",
         icon="data:image/png;base64,iVBORw0KGgo=",
         appleTouchIcon,
+        appStyle = style
     } = config;
 
-    const {state, content = {}} = wapp.response;
-    const res = (state && state.res) ? state.res : wapp.response;
-    const {statusCode = 200, containerElementId = "app", appStateName = "APP_STATE"} = res;
+    const {state, content = {}, statusCode = 200, containerElementId = "app", appStateName = "APP_STATE"} = res.wappResponse;
 
     let {render = "", title = "", description = "", author = ""} = content;
 
-    if (typeof title === "function") {title = title(wapp);}
+    if (typeof title === "function") {title = title({wapp, req, res});}
     title = `${(title) ? title : (statusCode === 404) ? "Not Found | " + siteName : "Untitled Page | " + siteName }`;
 
-    if (typeof description === "function") {description = description(wapp)}
+    if (typeof description === "function") {description = description({wapp, req, res})}
     description = (description) ? description : (title && title.split) ? title.split(" | ")[0] : title;
 
-    if (typeof author === "function") {author = author(wapp)}
+    if (typeof author === "function") {author = author({wapp, req, res})}
     author = (author || siteName)
 
-    if (typeof render === "function") {render = render(wapp)}
+    if (typeof render === "function") {render = render({wapp, req, res})}
 
     const scripts = assets.getScripts();
 
@@ -42,7 +41,7 @@ export default function html(wapp) {
 
     const stateText = `<script>window["${appStateName}"] = ${JSON.stringify(state || {})}</script>`;
 
-    wapp.styles.use(style);
+    wapp.styles.use(appStyle);
     const styles = wapp.styles.getCssText();
     const styleText = styles.map(function(style) {return `<style id="${style.id}">${style.cssText}</style>`}).join("");
 
@@ -66,7 +65,7 @@ export default function html(wapp) {
         ${headText}
     </head>
     <body>
-        <div class="${style.app}" id="${containerElementId}">${render}</div>
+        <div class="${appStyle.app}" id="${containerElementId}">${render}</div>
         ${stateText}
         ${scriptText}
     </body>

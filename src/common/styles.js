@@ -4,6 +4,8 @@ export function createDefaultStyleManager(p = {}) {
 
     const {wapp} = p;
 
+    let lastStyleElemId = null
+
     function defaultInsertCss(css, moduleId) {
 
         const id = `s${moduleId}`
@@ -13,21 +15,26 @@ export function createDefaultStyleManager(p = {}) {
 
         if (!elem) {
             create = true
-            elem = document.createElement('style')
-            elem.setAttribute('type', 'text/css')
+            elem = document.createElement("style")
+            elem.setAttribute("type", "text/css")
             elem.id = id;
         }
 
         let cssText = css;
 
-        if ('textContent' in elem) {
+        if ("textContent" in elem) {
             elem.textContent = cssText
         } else {
             elem.styleSheet.cssText = cssText
         }
 
         if (create) {
-            document.head.appendChild(elem)
+            if (lastStyleElemId && document.getElementById(lastStyleElemId)){
+                document.head.insertBefore(elem, document.getElementById(lastStyleElemId));
+            } else {
+                document.head.appendChild(elem);
+            }
+            lastStyleElemId = id;
         }
 
         return function remove(){

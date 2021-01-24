@@ -1,5 +1,6 @@
-import style from './template.css';
-import wapplrLogo from '../logo';
+import appStyle from "./app.css";
+import style from "./template.css";
+import wapplrLogo from "../logo";
 
 export default function template(p = {}) {
 
@@ -10,6 +11,7 @@ export default function template(p = {}) {
 
     const serverRender = (typeof window === "undefined");
 
+    styles.use(appStyle);
     styles.use(style);
 
     return `

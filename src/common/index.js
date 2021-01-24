@@ -64,99 +64,6 @@ export default function createWapp(p = {}) {
         return wapp[target];
     }
 
-    const defaultRequestProperties = {
-        timestamp: {
-            ...defaultDescriptor,
-            value: null,
-        },
-        path: {
-            ...defaultDescriptor,
-            value: null
-        },
-        url: {
-            ...defaultDescriptor,
-            value: null
-        },
-        method: {
-            ...defaultDescriptor,
-            value: null
-        },
-        httpVersion: {
-            ...defaultDescriptor,
-            value: null
-        },
-        hostname: {
-            ...defaultDescriptor,
-            value: null
-        },
-        protocol: {
-            ...defaultDescriptor,
-            value: null
-        },
-        secure: {
-            ...defaultDescriptor,
-            value: null
-        },
-
-        remoteAddress: {
-            ...defaultDescriptor,
-            value: null
-        },
-        userAgent: {
-            ...defaultDescriptor,
-            value: null
-        },
-
-        req: {
-            ...defaultDescriptor,
-            enumerable: false,
-            value: null
-        },
-        res: {
-            ...defaultDescriptor,
-            enumerable: false,
-            value: null
-        },
-    }
-
-    const defaultResponseProperties = {
-        statusCode: {
-            ...defaultDescriptor,
-            value: null
-        },
-        statusMessage: {
-            ...defaultDescriptor,
-            value: null
-        },
-        errorMessage: {
-            ...defaultDescriptor,
-            value: null
-        },
-        containerElementId: {
-            ...defaultDescriptor,
-            value: null
-        },
-        appStateName: {
-            ...defaultDescriptor,
-            value: null
-        },
-        sended: {
-            ...defaultDescriptor,
-            value: null
-        },
-
-        req: {
-            ...defaultDescriptor,
-            enumerable: false,
-            value: null
-        },
-        res: {
-            ...defaultDescriptor,
-            enumerable: false,
-            value: null
-        },
-    };
-
     const wapp = Object.create(Object.prototype, {
         config: {
             ...defaultDescriptor,
@@ -178,46 +85,9 @@ export default function createWapp(p = {}) {
             writable: false,
             value: defaultGetTargetObject
         },
-        response: {
-            ...defaultDescriptor,
-            value: Object.create(Object.prototype, defaultResponseProperties)
-        },
-        request: {
-            ...defaultDescriptor,
-            value: Object.create(Object.prototype, defaultRequestProperties)
-        },
-        defaultResponse: {
-            ...defaultDescriptor,
-            writable: false,
-            enumerable: false,
-            value: Object.create(Object.prototype, defaultResponseProperties)
-        },
-        defaultRequest: {
-            ...defaultDescriptor,
-            writable: false,
-            enumerable: false,
-            value: Object.create(Object.prototype, defaultRequestProperties)
-        },
-        resetResponse: {
-            ...defaultDescriptor,
-            enumerable: false,
-            value: function () {
-                this.response = mergeProperties({}, this.defaultResponse)
-                return this.response;
-            }
-        },
-        resetRequest: {
-            ...defaultDescriptor,
-            enumerable: false,
-            value: function () {
-                this.request = mergeProperties({}, this.defaultRequest)
-                return this.request;
-            }
-        }
     });
 
     Object.defineProperty(wapp, "wapp", {...defaultDescriptor, writable: false, enumerable: false, value: wapp});
-    Object.defineProperty(wapp.response, "wapp", {...defaultDescriptor, writable: false, enumerable: false, value: wapp});
 
     return wapp;
 

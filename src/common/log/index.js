@@ -10,11 +10,11 @@ export default function createLog({wapp}) {
 
     function defaultRender(p = {}) {
 
-        const {wapp, parent = template, logo = wapplrLogo} = p;
+        const {wapp, req, res, parent = template, logo = wapplrLogo} = p;
 
-        const {request, response, styles} = wapp;
-        const {remoteAddress, httpVersion, method, url, timestamp} = request;
-        const {statusCode = 200, statusMessage = "", errorMessage = ""} = response;
+        const {styles} = wapp;
+        const {remoteAddress, httpVersion, method, url, timestamp} = req.wappRequest;
+        const {statusCode = 200, statusMessage = "", errorMessage = ""} = res.wappResponse;
 
         const text = p.text || `[LOG] [${timestamp} - ${remoteAddress}] HTTP:${httpVersion} ${method} ${url || "/"} -> [${statusCode}] ${errorMessage || statusMessage}`;
 
@@ -58,16 +58,8 @@ export default function createLog({wapp}) {
             next = d;
         }
 
-        if (req){
-            req = req.wapp.request;
-        }
-
-        if (res){
-            res = res.wapp.response;
-        }
-
-        const { httpVersion, method, url, remoteAddress, timestamp = Date.now() } = req;
-        const { statusCode = "", statusMessage = "" } = res;
+        const { httpVersion, method, url, remoteAddress, timestamp = Date.now() } = req.wappRequest;
+        const { statusCode = "", statusMessage = "" } = res.wappResponse;
 
         const errorMessage = (error && error.stack) ? error.stack : (error && error.message) ? error.message : (typeof error == "string") ? error : "";
 

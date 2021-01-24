@@ -201,14 +201,18 @@ export default function createStates(p = {}) {
     function addSomePropertyToClientAppFromInitialState(req, res, next) {
 
         // the client can't set this properties from the window location,
-        // so if the server sent these data, then these are setting here to app.req and wapp.request:
+        // so if the server sent these data, then these are setting here to app.req and wappRequest:
         // method, httpVersion, remoteAddress
 
         // req.timestamp, res.statusCode, statusMessage, errorMessage will update in every client side update,
         // but the first render need this data from the server
 
         if (wapp.target === "web"){
-            const appStateName = wapp.response.appStateName;
+
+            const wappResponse = res.wappResponse;
+            const wappRequest = req.wappRequest;
+
+            const appStateName = wappResponse.appStateName;
             const initialState = window[appStateName];
 
             if (initialState) {
@@ -220,23 +224,23 @@ export default function createStates(p = {}) {
                 req.method = reqFromState.method || req.method;
                 req.remoteAddress = reqFromState.remoteAddress || req.remoteAddress;
 
-                wapp.request.method = req.method;
-                wapp.request.httpVersion = req.httpVersion;
-                wapp.request.remoteAddress = req.remoteAddress;
+                wappRequest.method = req.method;
+                wappRequest.httpVersion = req.httpVersion;
+                wappRequest.remoteAddress = req.remoteAddress;
 
-                if (!statesMiddleware.initialized){
+                if (statesMiddleware.shouldInitializedStore){
 
                     req.timestamp = reqFromState.timestamp || req.timestamp;
-                    wapp.request.timestamp = req.timestamp;
+                    wappRequest.timestamp = req.timestamp;
 
                     res.statusCode = resFromState.statusCode || res.statusCode;
-                    wapp.response.statusCode = res.statusCode;
+                    wappResponse.statusCode = res.statusCode;
 
                     res.statusMessage = resFromState.statusMessage || res.statusMessage;
-                    wapp.response.statusMessage = res.statusMessage;
+                    wappResponse.statusMessage = res.statusMessage;
 
                     res.errorMessage = resFromState.errorMessage || res.errorMessage;
-                    wapp.response.errorMessage = res.errorMessage;
+                    wappResponse.errorMessage = res.errorMessage;
 
                 }
 
@@ -248,24 +252,29 @@ export default function createStates(p = {}) {
 
     }
 
+    let lastStoreForClient = null;
+
     function defaultStatesForReqRes(req, res, next){
 
-        const timestamp = wapp.request.timestamp;
-        const path = wapp.request.path;
-        const url = wapp.request.url;
-        const method = wapp.request.method;
-        const httpVersion = wapp.request.httpVersion;
-        const hostname = wapp.request.hostname;
-        const protocol = wapp.request.protocol;
-        const secure = wapp.request.secure;
-        const remoteAddress = wapp.request.remoteAddress;
-        const userAgent = wapp.request.userAgent;
+        const wappRequest = req.wappRequest;
+        const wappResponse = res.wappResponse;
 
-        const statusCode = wapp.response.statusCode;
-        const statusMessage = wapp.response.statusMessage;
-        const errorMessage = wapp.response.errorMessage;
-        const containerElementId = wapp.response.containerElementId;
-        const appStateName = wapp.response.appStateName;
+        const timestamp = wappRequest.timestamp;
+        const path = wappRequest.path;
+        const url = wappRequest.url;
+        const method = wappRequest.method;
+        const httpVersion = wappRequest.httpVersion;
+        const hostname = wappRequest.hostname;
+        const protocol = wappRequest.protocol;
+        const secure = wappRequest.secure;
+        const remoteAddress = wappRequest.remoteAddress;
+        const userAgent = wappRequest.userAgent;
+
+        const statusCode = wappResponse.statusCode;
+        const statusMessage = wappResponse.statusMessage;
+        const errorMessage = wappResponse.errorMessage;
+        const containerElementId = wappResponse.containerElementId;
+        const appStateName = wappResponse.appStateName;
 
         const initState = (wapp.target === "web" && window[appStateName]) ? window[appStateName] : {
             req: {
@@ -289,100 +298,105 @@ export default function createStates(p = {}) {
             }
         }
 
-        const init = !(statesMiddleware.initialized);
+        const init = statesMiddleware.shouldInitializedStore;
 
-        const store = (init) ? wapp.states.stateManager.createStore(wapp.states.stateManager.rootReducer, initState) : wapp.states.store;
+        const store = (init) ? wapp.states.stateManager.createStore(wapp.states.stateManager.rootReducer, initState) : wappResponse.store;
 
         if (init){
-            Object.defineProperty(statesMiddleware, "store", {
+            Object.defineProperty(wappResponse, "store", {
                 writable: true,
                 enumerable: true,
                 configurable: false,
                 value: store,
             });
+
+            if (wapp.target === "web"){
+                lastStoreForClient = wappResponse.store;
+            }
+
         }
 
         const stateBefore = store.getState();
 
         if (!init || (init && initState.req.timestamp !== timestamp)) {
             if (stateBefore.req.timestamp !== timestamp) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "timestamp", value: timestamp}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "timestamp", value: timestamp}))
             }
         }
         if (!init || (init && initState.req.path !== path)) {
             if (stateBefore.req.path !== path) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "path", value: path}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "path", value: path}))
             }
         }
         if (!init || (init && initState.req.url !== url)) {
             if (stateBefore.req.url !== url) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "url", value: url}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "url", value: url}))
             }
         }
         if (!init || (init && initState.req.method !== method)) {
             if (stateBefore.req.method !== method) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "method", value: method}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "method", value: method}))
             }
         }
         if (!init || (init && initState.req.httpVersion !== httpVersion)) {
             if (stateBefore.req.httpVersion !== httpVersion) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "httpVersion", value: httpVersion}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "httpVersion", value: httpVersion}))
             }
         }
         if (!init || (init && initState.req.hostname !== hostname)) {
             if (stateBefore.req.hostname !== hostname) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "hostname", value: hostname}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "hostname", value: hostname}))
             }
         }
         if (!init || (init && initState.req.protocol !== protocol)) {
             if (stateBefore.req.protocol !== protocol) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "protocol", value: protocol}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "protocol", value: protocol}))
             }
         }
         if (!init || (init && initState.req.secure !== secure)) {
             if (stateBefore.req.secure !== secure) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "secure", value: secure}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "secure", value: secure}))
             }
         }
         if (!init || (init && initState.req.remoteAddress !== remoteAddress)) {
             if (stateBefore.req.remoteAddress !== remoteAddress) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "remoteAddress", value: remoteAddress}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "remoteAddress", value: remoteAddress}))
             }
         }
         if (!init || (init && initState.req.userAgent !== userAgent)) {
             if (stateBefore.req.userAgent !== userAgent) {
-                wapp.states.store.dispatch(wapp.states.runAction("req", {name: "userAgent", value: userAgent}))
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "userAgent", value: userAgent}))
             }
         }
 
 
         if (!init || (init && initState.res.statusCode !== statusCode)) {
             if (stateBefore.res.statusCode !== statusCode) {
-                wapp.states.store.dispatch(wapp.states.runAction("res", {name: "statusCode", value: statusCode}))
+                wappResponse.store.dispatch(wapp.states.runAction("res", {name: "statusCode", value: statusCode}))
             }
         }
         if (!init || (init && initState.res.statusMessage !== statusMessage)) {
             if (stateBefore.res.statusMessage !== statusMessage) {
-                wapp.states.store.dispatch(wapp.states.runAction("res", {name: "statusMessage", value: statusMessage}))
+                wappResponse.store.dispatch(wapp.states.runAction("res", {name: "statusMessage", value: statusMessage}))
             }
         }
         if (!init || (init && initState.res.errorMessage !== errorMessage)) {
             if (stateBefore.res.errorMessage !== errorMessage) {
-                wapp.states.store.dispatch(wapp.states.runAction("res", {name: "errorMessage", value: errorMessage}))
+                wappResponse.store.dispatch(wapp.states.runAction("res", {name: "errorMessage", value: errorMessage}))
             }
         }
         if (!init || (init && initState.res.appStateName !== appStateName)) {
             if (stateBefore.res.appStateName !== appStateName) {
-                wapp.states.store.dispatch(wapp.states.runAction("res", {name: "appStateName", value: appStateName}))
+                wappResponse.store.dispatch(wapp.states.runAction("res", {name: "appStateName", value: appStateName}))
             }
         }
         if (!init || (init && initState.res.containerElementId !== containerElementId)) {
             if (stateBefore.res.containerElementId !== containerElementId) {
-                wapp.states.store.dispatch(wapp.states.runAction("res", {name: "containerElementId", value: containerElementId}))
+                wappResponse.store.dispatch(wapp.states.runAction("res", {name: "containerElementId", value: containerElementId}))
             }
         }
 
-        wapp.response.state = wapp.states.store.getState();
+        wappResponse.state = wappResponse.store.getState();
 
         next();
 
@@ -390,7 +404,7 @@ export default function createStates(p = {}) {
 
     function defaultHandle(req, res, out){
 
-        const statesMiddlewares = Object.keys(statesMiddleware.handles).map(function (key) {return statesMiddleware.handles[key]})
+        const statesMiddlewares = Object.keys(statesMiddleware.handles).sort().map(function (key) {return statesMiddleware.handles[key]})
 
         let index = 0;
 
@@ -451,22 +465,25 @@ export default function createStates(p = {}) {
             ...defaultDescriptor,
             value: defaultRunAction
         },
-        initialized: {
+        shouldInitializedStore: {
             ...defaultDescriptor,
             value: false
         },
-        store: {
-            ...defaultDescriptor,
-            value: null
-        }
     })
 
-    function statesMiddleware(req, res, next) {
-        statesMiddleware.initialized = !(wapp.target === "node" || !statesMiddleware.store);
+    function statesMiddleware(req, res, out) {
         if (typeof statesMiddleware.handle === "function"){
-            statesMiddleware.handle(req, res, next);
+
+            if (!res.wappResponse.store && wapp.target === "web" && lastStoreForClient){
+                res.wappResponse.store = lastStoreForClient;
+            }
+            statesMiddleware.shouldInitializedStore = (wapp.target === "node" || !res.wappResponse.store);
+            statesMiddleware.handle(req, res, function next() {
+                statesMiddleware.shouldInitializedStore = (wapp.target === "node" || !res.wappResponse.store);
+                out();
+            });
         }
-        statesMiddleware.initialized = !(wapp.target === "node" || !statesMiddleware.store);
+
         return statesMiddleware;
     }
 
