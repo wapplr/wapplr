@@ -143,7 +143,7 @@ export default function createRequests(p = {}) {
     async function defaultSend(p) {
         const {res} = p;
         const response = await requestManager.sendRequest(p);
-        if (res && res.wappResponse.store){
+        if (res && res.wappResponse.store && response){
             Object.keys(response).forEach(function (requestName) {
                 res.wappResponse.store.dispatch(wapp.states.stateManager.actions.res({
                     type: "INS_RES",
