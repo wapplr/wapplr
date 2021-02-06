@@ -175,13 +175,17 @@ export default function createApp(p = {}) {
             // res: statusCode, headersSent
             // and some function in res: end, setHeader
 
+            const fullUrl = req.protocol + "://" + req.hostname + req.url;
+
             if (!req.path) {
-                req.path = new URL(req.url).pathname;
+                try {
+                req.path = new URL(fullUrl).pathname;
+                } catch (e) {}
             }
 
             if (!req.query){
                 try {
-                    req.query = Object.fromEntries(new URL(req.url).searchParams);
+                    req.query = Object.fromEntries(new URL(fullUrl).searchParams);
                 } catch (e){}
             }
 

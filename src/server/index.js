@@ -12,6 +12,10 @@ export function createMiddleware(p = {}) {
 }
 
 export function run(p = {}) {
+
+    const {env} = process;
+    env.NODE_ENV = process.env.NODE_ENV;
+
     const wapp = createServer(p);
     const globals = wapp.globals;
     const {DEV} = globals;
