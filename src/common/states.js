@@ -140,7 +140,8 @@ export function createDefaultStateManager(p = {}) {
     }
 
     function defaultRunListeners(newState, action) {
-        stateManager.listeners.forEach(function (listener) {
+        const listeners = [...stateManager.listeners];
+        listeners.forEach(function (listener) {
             listener(newState, action)
         })
     }
@@ -269,6 +270,7 @@ export default function createStates(p = {}) {
         const secure = wappRequest.secure;
         const remoteAddress = wappRequest.remoteAddress;
         const userAgent = wappRequest.userAgent;
+        const query = wappRequest.query;
 
         const statusCode = wappResponse.statusCode;
         const statusMessage = wappResponse.statusMessage;
@@ -287,7 +289,8 @@ export default function createStates(p = {}) {
                 protocol: protocol,
                 secure: secure,
                 remoteAddress: remoteAddress,
-                userAgent: userAgent
+                userAgent: userAgent,
+                query: query
             },
             res: {
                 statusCode: statusCode,
@@ -366,6 +369,11 @@ export default function createStates(p = {}) {
         if (!init || (init && initState.req.userAgent !== userAgent)) {
             if (stateBefore.req.userAgent !== userAgent) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "userAgent", value: userAgent}))
+            }
+        }
+        if (!init || (init && initState.req.query !== query)) {
+            if (stateBefore.req.query !== query) {
+                wappResponse.store.dispatch(wapp.states.runAction("req", {name: "query", value: query}))
             }
         }
 

@@ -1,7 +1,7 @@
 import {mergeProperties, defaultDescriptor} from '../common/utils.js';
 import serveStatic from "./static";
 
-import url from 'url';
+import {URL} from 'url';
 
 export default function createApp(p = {}) {
 
@@ -176,7 +176,13 @@ export default function createApp(p = {}) {
             // and some function in res: end, setHeader
 
             if (!req.path) {
-                req.path = url.parse(req.url).pathname;
+                req.path = new URL(req.url).pathname;
+            }
+
+            if (!req.query){
+                try {
+                    req.query = Object.fromEntries(new URL(req.url).searchParams);
+                } catch (e){}
             }
 
             if (!res.status) {

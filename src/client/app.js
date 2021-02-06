@@ -139,9 +139,14 @@ export default function createApp(p = {}) {
             req.url = req.url || pathname + hash + search;
             req.hostname = req.hostname || (port) ? window.location.hostname + ":" + port : window.location.hostname;
             req.protocol = req.protocol || window.location.protocol.slice(0, window.location.protocol.length - 1);
-            req.secure = req.secure || req.protocol === 'https';
+            req.secure = req.secure || req.protocol === "https";
             req.method = req.method || "GET";
             req.httpVersion = req.httpVersion || "1.1";
+
+            try {
+                const fullUrl = req.protocol + "://" + req.hostname + req.url;
+                req.query = Object.fromEntries(new URL(fullUrl).searchParams);
+            } catch (e) {}
 
             res.statusCode = (res.statusCode) ? res.statusCode : 200;
 

@@ -63,7 +63,8 @@ function createWappMiddleware(p = {}) {
         wappRequest.protocol = req.protocol;
         wappRequest.secure = req.secure;
         wappRequest.remoteAddress = req.remoteAddress;
-        wappRequest.userAgent = (req.headers && req.headers["user-agent"]) ? req.headers["user-agent"] : (typeof window !== "undefined" && window.navigator) ? window.navigator.userAgent : ""
+        wappRequest.userAgent = (req.headers && req.headers["user-agent"]) ? req.headers["user-agent"] : (typeof window !== "undefined" && window.navigator) ? window.navigator.userAgent : "";
+        wappRequest.query = req.query;
 
         Object.defineProperty(wappRequest, "wapp", {
             ...defaultDescriptor,
