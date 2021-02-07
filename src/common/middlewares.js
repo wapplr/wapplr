@@ -59,8 +59,8 @@ function createWappMiddleware(p = {}) {
         wappRequest.url = req.url;
         wappRequest.method = req.method;
         wappRequest.httpVersion = req.httpVersion;
-        wappRequest.hostname = (req.headers && req.headers.host) ? req.headers.host : req.hostname;
-        wappRequest.protocol = req.protocol;
+        wappRequest.hostname = (req.headers && req.headers.host) ? req.headers.host : (req.authority) ? req.authority : req.hostname;
+        wappRequest.protocol = (wappRequest.httpVersion && wappRequest.httpVersion.startsWith("2")) ? "https" : req.protocol;
         wappRequest.secure = req.secure;
         wappRequest.remoteAddress = req.remoteAddress;
         wappRequest.userAgent = (req.headers && req.headers["user-agent"]) ? req.headers["user-agent"] : (typeof window !== "undefined" && window.navigator) ? window.navigator.userAgent : "";
