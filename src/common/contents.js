@@ -4,10 +4,15 @@ function createDefaultContentManager(p = {}) {
 
     const {wapp} = p;
 
-    function defaultResolve(p = {}) {
-        const {contentName} = p;
+    async function defaultResolve(p = {}) {
+        const {route, wapp, req, res} = p;
+        const {contentName} = route;
         const contents = contentManager.contents;
-        return (contentName && contents[contentName]) ? {...contents[contentName]} : null
+        const content = (contentName && contents[contentName]) ? {...contents[contentName]} : null;
+        if (content.request){
+            await content.request({wapp, req, res});
+        }
+        return content;
     }
 
     function getTitle({wapp, req, res}) {
@@ -144,10 +149,10 @@ export default function createContents(p = {}) {
 
     const {wapp, contentManager = createDefaultContentManager(p)} = p;
 
-    function defaultHandle(req, res, next){
+    async function defaultHandle(req, res, next){
         if (!res.wappResponse.content) {
             const contentRes = contentsMiddleware.contentManager.resolve;
-            res.wappResponse.content = contentRes(res.wappResponse.route);
+            res.wappResponse.content = await contentRes({route: res.wappResponse.route, wapp, req, res});
         }
         return next();
     }
@@ -195,9 +200,9 @@ export default function createContents(p = {}) {
         }
     })
 
-    function contentsMiddleware(req, res, next) {
+    async function contentsMiddleware(req, res, next) {
         if (typeof contentsMiddleware.handle === "function") {
-            return contentsMiddleware.handle(req, res, next);
+            return await contentsMiddleware.handle(req, res, next);
         }
         return contentsMiddleware;
     }

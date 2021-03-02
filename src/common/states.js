@@ -30,7 +30,7 @@ export function createDefaultStateManager(p = {}) {
                         };
                     case "INS_RES":
                         if (typeof action.payload.value === "object" && action.payload.value &&
-                        typeof state[action.payload.name] === "object" && action.payload.value) {
+                        typeof state[action.payload.name] === "object" && state[action.payload.name]) {
                             return {
                                 ...state,
                                 [action.payload.name]: {

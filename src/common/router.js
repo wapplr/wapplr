@@ -90,15 +90,15 @@ export function createDefaultRouter(p = {}) {
     }
 
     async function defaultResolve(p = {}) {
-        const {path} = p;
+        const {path, req, res} = p;
         const {action, ...rest} = router.getRoute({path});
         let r = {...rest};
         if (action) {
-            r =  await action({wapp, ...rest});
+            r =  await action({wapp, req, res, ...rest});
         }
         if (router.action){
             const routerAction = router.action;
-            r = await routerAction({wapp, ...rest})
+            r = await routerAction({wapp, req, res, ...rest})
         }
         return r;
     }
@@ -228,7 +228,7 @@ export default function createRouter(p = {}) {
         const routerRes = routerMiddleware.routeManager.resolve;
         const path = wappRequest.path || wappRequest.url;
 
-        const route = await routerRes({path});
+        const route = await routerRes({path, req, res});
 
         wappResponse.statusCode = (wappResponse.statusCode === 200 || !wappResponse.statusCode) ? route.status : wappResponse.statusCode;
         wappResponse.route = route;

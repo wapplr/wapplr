@@ -119,6 +119,10 @@ function createHistoryManager() {
         history.runListeners({action:"PUSH", location: {...history.location, key: history.state.key}});
     }
 
+    function defaultGo(delta) {
+        globalHistory.go(delta);
+    }
+
     function defaultListen(...attributes) {
         const fn = (attributes[0]) ? attributes[0] : null;
         history.init();
@@ -185,6 +189,10 @@ function createHistoryManager() {
         push: {
             ...defaultDescriptor,
             value: defaultPush
+        },
+        go: {
+            ...defaultDescriptor,
+            value: defaultGo
         },
         parsePath: {
             ...defaultDescriptor,

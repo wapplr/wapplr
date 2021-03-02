@@ -59,13 +59,6 @@ function createDefaultRequestManager(p = {}) {
 
         let requestBody = (typeof getBody == "function") ? getBody({wapp, ...p}) : body;
 
-        if (typeof requestBody == "string" && requestBody.replace) {
-            requestBody = requestBody.replace(/\n/g, " ");
-            requestBody = requestBody.replace(/\\n/g, " ");
-            requestBody = requestBody.replace(/  +/g, ' ');
-            requestBody = requestBody.replace(/":" /g, '":"');
-        }
-
         const cookie = (req && req.headers) ? req.headers.cookie : null;
         if (cookie) {
             options.headers.cookie = cookie;
@@ -144,14 +137,12 @@ export default function createRequests(p = {}) {
         const {res} = p;
         const response = await requestManager.sendRequest(p);
         if (res && res.wappResponse.store && response){
-            Object.keys(response).forEach(function (requestName) {
-                res.wappResponse.store.dispatch(wapp.states.stateManager.actions.res({
-                    type: "INS_RES",
-                    name: "responses",
-                    value: response
-                }));
-                res.wappResponse.state = res.wappResponse.store.getState();
-            })
+            res.wappResponse.store.dispatch(wapp.states.stateManager.actions.res({
+                type: "INS_RES",
+                name: "responses",
+                value: response
+            }));
+            res.wappResponse.state = res.wappResponse.store.getState();
         }
         return response;
     }

@@ -33,18 +33,18 @@ export default function createClient(p = {}) {
         wapplrClient.history.listen(function ({action, location}) {
             wapplrClient.app({history: {action, location}});
         });
-        wapplrClient.app({history: {action: "POP", location: history.location}});
 
-        setTimeout(function () {
-
+        wapplrClient.app({history: {action: "POP", location: history.location}}, {}, function out() {
             const globals = wapp.globals;
             const { WAPP } = globals;
 
-            const elem = document.getElementById("css_"+WAPP);
-            if (elem) {
-                elem.parentNode.removeChild(elem);
-            }
-        })
+            setTimeout(function () {
+                const elem = document.getElementById("css_"+WAPP);
+                if (elem) {
+                    elem.parentNode.removeChild(elem);
+                }
+            },2000)
+        });
 
     }
 
