@@ -22,7 +22,7 @@
     "files": [
         "dist/*"
     ],
-    "version": "1.0.21",
+    "version": "1.0.22",
     "main": "dist/server",
     "browser": "dist/client",
     "repository": {
