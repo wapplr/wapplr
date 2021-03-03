@@ -19,7 +19,6 @@ export default function getConfig(p = {}){
         containerElementId: (typeof globals.WAPP !== "undefined" && globals.WAPP) ? (typeof globals.DEV !== "undefined" && globals.DEV) ? "wapplr-container-element-id-"+ globals.WAPP : globals.WAPP : "app",
         appStateName: (typeof globals.WAPP !== "undefined" && globals.WAPP) ? (typeof globals.DEV !== "undefined" && globals.DEV) ? "WAPPLR_APP_STATE_" + globals.WAPP : globals.WAPP : "APP_STATE",
         siteName: commonConfig.siteName || "Wapplr",
-        description: commonConfig.description || "Wapplr.com is a website for introducing Wapplr and even an example for how to use it.",
         lang: commonConfig.lang || "en"
     };
 
