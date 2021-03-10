@@ -4,19 +4,19 @@ export function createDefaultStyleManager(p = {}) {
 
     const {wapp} = p;
 
-    let lastStyleElemId = null
+    let lastStyleElemId = null;
 
     function defaultInsertCss(css, moduleId) {
 
-        const id = `s${moduleId}`
+        const id = `s${moduleId}`;
 
-        let elem = document.getElementById(id)
-        let create = false
+        let elem = document.getElementById(id);
+        let create = false;
 
         if (!elem) {
-            create = true
-            elem = document.createElement("style")
-            elem.setAttribute("type", "text/css")
+            create = true;
+            elem = document.createElement("style");
+            elem.setAttribute("type", "text/css");
             elem.id = id;
         }
 
@@ -38,7 +38,7 @@ export function createDefaultStyleManager(p = {}) {
         }
 
         return function remove(){
-            const elem = document.getElementById(id)
+            const elem = document.getElementById(id);
             if (elem) {
                 elem.parentNode.removeChild(elem)
             }
@@ -52,7 +52,7 @@ export function createDefaultStyleManager(p = {}) {
             const {insertCss} = styleManager;
             const moduleId = (style._module && style._module.id) ? style._module.id : "";
             return insertCss(cssText, moduleId);
-        }
+        };
         if (style._module && style._module.hot && wapp.getTargetObject().hot){
             wapp.getTargetObject().hot.accept(style._module.id);
         }
@@ -61,7 +61,7 @@ export function createDefaultStyleManager(p = {}) {
         let tempLength = css.size;
         let duplicates = false;
 
-        css.add(style)
+        css.add(style);
 
         if (tempLength === css.size){
             duplicates = true;
@@ -71,13 +71,13 @@ export function createDefaultStyleManager(p = {}) {
 
             if (typeof window !== "undefined") {
 
-                let removeCssFunction = style._insertCss()
+                let removeCssFunction = style._insertCss();
 
                 style._remove = function _remove() {
                     removeCssFunction();
-                    css.delete(style)
+                    css.delete(style);
                     styleManager.removeCss.delete(style._remove);
-                }
+                };
 
                 styleManager.removeCss.add(style._remove);
                 return style._remove;
@@ -85,9 +85,9 @@ export function createDefaultStyleManager(p = {}) {
             } else {
 
                 style._remove = function _remove() {
-                    css.delete(style)
+                    css.delete(style);
                     styleManager.removeCss.delete(style._remove);
-                }
+                };
 
                 styleManager.removeCss.add(style._remove);
                 return style._remove;
@@ -114,13 +114,13 @@ export function createDefaultStyleManager(p = {}) {
     function defaultClear() {
         [...styleManager.removeCss].forEach(function (remove){
             remove();
-        })
+        });
         styleManager.removeCss = new Set();
         styleManager.css = new Set();
     }
 
     function defaultUse(styles) {
-        const {add} = styleManager
+        const {add} = styleManager;
         return add(styles)
     }
 
@@ -162,7 +162,7 @@ export function createDefaultStyleManager(p = {}) {
             ...defaultDescriptor,
             value: defaultGetCssText
         }
-    })
+    });
 
     return styleManager;
 
@@ -215,7 +215,7 @@ export default function createStyleManager(p = {}) {
             ...defaultDescriptor,
             value: defaultGetCssText
         }
-    })
+    });
 
     function stylesMiddleware(req, res, next) {
         if (typeof stylesMiddleware.handle === "function"){

@@ -48,7 +48,7 @@ function createHistoryManager() {
             pathname,
             search,
             hash,
-        }
+        };
 
         state.key = state.key || createKey();
 
@@ -106,9 +106,9 @@ function createHistoryManager() {
             search,
             hash,
             ...(typeof to === "string" ? history.parsePath(to) : to),
-        }
+        };
 
-        const url = createHref(newLocation)
+        const url = createHref(newLocation);
         state.key = state.key || createKey();
 
         history.location = newLocation;
@@ -127,7 +127,7 @@ function createHistoryManager() {
         const fn = (attributes[0]) ? attributes[0] : null;
         history.init();
         if (fn){
-            const nI = Object.keys(history.listeners).length
+            const nI = Object.keys(history.listeners).length;
             history.addListener({[nI.toString()]: fn});
         }
     }
@@ -198,7 +198,7 @@ function createHistoryManager() {
             ...defaultDescriptor,
             value: defaultParsePath
         }
-    })
+    });
 
     return history;
 
@@ -208,7 +208,7 @@ export default function createHistory(p = {}) {
 
     const {wapp, history = createHistoryManager()} = p;
 
-    const historyProperties = Object.create(Object.prototype, {})
+    const historyProperties = Object.create(Object.prototype, {});
 
     mergeProperties(history, historyProperties);
 

@@ -27,21 +27,21 @@ export default function serveStatic (publicPath) {
         try {
             const data = fs.readFileSync(pathname);
             const stats = fs.statSync(pathname);
-            res.wappResponse.status(200)
+            res.wappResponse.status(200);
 
             res.wappResponse.sendData = {
                 data,
                 stats,
                 parsedPath: paredSanitizePath
-            }
+            };
 
-            const stream = fs.createReadStream(pathname)
+            const stream = fs.createReadStream(pathname);
 
             stream.on("error", function onerror (err) {
                 res.wappResponse.status(err.statusCode || 500, err);
                 res.wapp.log(err, req, res);
                 next(err)
-            })
+            });
 
             stream.on("open", function onopen () {
                 res.wapp.middleware.runSendMiddlewares(req, res, function next() {
@@ -51,7 +51,7 @@ export default function serveStatic (publicPath) {
             });
 
         } catch (err) {
-            res.wappResponse.status(err.statusCode || 500, err)
+            res.wappResponse.status(err.statusCode || 500, err);
             res.wapp.log(err, req, res);
             next(err)
         }

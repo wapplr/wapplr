@@ -7,12 +7,12 @@ export default function getConfig(p = {}){
     const clientConfig = config.client || {};
     const commonConfig = getCommonConfig(p).config;
 
-    const globals = {...commonConfig.globals}
-    const common = {...commonConfig.common}
+    const globals = {...commonConfig.globals};
+    const common = {...commonConfig.common};
 
     const client = {
         ...clientConfig,
-    }
+    };
 
     return {
         config: {

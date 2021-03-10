@@ -26,7 +26,7 @@ export default function createLog({wapp}) {
                     ${(logo) ? logo({wapp}) : ""}
                 </div>
                 <div>${text}</div>
-            </div>`
+            </div>`;
 
         if (parent) {
             return parent({...p, children: renderedLog})
@@ -63,7 +63,7 @@ export default function createLog({wapp}) {
 
         const errorMessage = (error && error.stack) ? error.stack : (error && error.message) ? error.message : (typeof error == "string") ? error : "";
 
-        const text = `[LOG] [${timestamp} - ${remoteAddress}] HTTP:${httpVersion} ${method} ${url || "/"} -> [${statusCode}] ${errorMessage || statusMessage}`
+        const text = `[LOG] [${timestamp} - ${remoteAddress}] HTTP:${httpVersion} ${method} ${url || "/"} -> [${statusCode}] ${errorMessage || statusMessage}`;
 
         if (res._consoledResponse !== text) {
             Object.defineProperty(res, "_consoledResponse", {...defaultDescriptor, enumerable: false, value: text });
@@ -90,7 +90,7 @@ export default function createLog({wapp}) {
             ...defaultDescriptor,
             value: renderedContent
         }
-    })
+    });
 
     function logMiddleware(err, req, res, next) {
         if (typeof logMiddleware.handle === "function"){

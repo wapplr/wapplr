@@ -10,7 +10,7 @@ export default function createClient(p = {}) {
 
     const wapp = p.wapp || createWapp(p);
 
-    const {config} = createConfig(p)
+    const {config} = createConfig(p);
     const clientConfig = config.client || {};
 
     const {disableUseDefaultMiddlewares = false, ...rest} = clientConfig;
@@ -20,13 +20,13 @@ export default function createClient(p = {}) {
             ...defaultDescriptor,
             value: disableUseDefaultMiddlewares
         },
-    })
+    });
 
     mergeProperties(defaultConfig, wapp.config);
     mergeProperties(defaultConfig, rest);
 
-    const app = createApp({wapp})
-    const history = createHistory({wapp})
+    const app = createApp({wapp});
+    const history = createHistory({wapp});
 
     function defaultListen () {
         wapplrClient.close();
@@ -89,7 +89,7 @@ export default function createClient(p = {}) {
 
         if (!wapplrClient.config.disableUseDefaultMiddlewares){
 
-            const middlewares = Object.keys(wapplrClient.middlewares).map(function (key) { return wapplrClient.middlewares[key] })
+            const middlewares = Object.keys(wapplrClient.middlewares).map(function (key) { return wapplrClient.middlewares[key] });
             let index = 0;
 
             async function next(err) {
@@ -117,7 +117,7 @@ export default function createClient(p = {}) {
 
         return await out();
 
-    })
+    });
 
     return wapp;
 

@@ -4,7 +4,7 @@ export default function createApp(p = {}) {
 
     const {wapp} = p;
 
-    const defaultConfig = Object.create(Object.prototype, {})
+    const defaultConfig = Object.create(Object.prototype, {});
 
     const defaultMiddlewares = [
         function next(req, res, next) {
@@ -13,12 +13,12 @@ export default function createApp(p = {}) {
             }
             return null;
         }
-    ]
+    ];
 
     function defaultErrorHandler(err, req, res, next) {
 
         const {log = function (){ return "" }} = app.wapp;
-        res.status(500)
+        res.status(500);
         const text = log(err, req, res);
 
         if (res.headersSent) {
@@ -35,7 +35,7 @@ export default function createApp(p = {}) {
             title: err.message + " | " + siteName,
             text: text.split("\n")[0],
             type: "content"
-        })
+        });
 
         res.send(renderedContent);
 
@@ -91,7 +91,7 @@ export default function createApp(p = {}) {
 
         fns.forEach(function (fn, i){
             middlewares.push(fn)
-        })
+        });
 
         return this;
     }
@@ -119,7 +119,7 @@ export default function createApp(p = {}) {
             ...defaultDescriptor,
             value: defaultUse
         }
-    })
+    });
 
     async function app(req = {}, res = {}, next) {
 
@@ -153,15 +153,15 @@ export default function createApp(p = {}) {
             res.status = res.status || function (sc){
                 res.statusCode = sc;
                 return res;
-            }
+            };
 
             res.send = res.send || function (html) {
                 res.end(html);
-            }
+            };
 
             res.end = res.end || function (html) {
                 if (!res.headersSent) {
-                    Object.defineProperty(res, "headersSent", {...defaultDescriptor, enumerable: false, writable: false, value: true})
+                    Object.defineProperty(res, "headersSent", {...defaultDescriptor, enumerable: false, writable: false, value: true});
                     res.container.innerHTML = html;
                     const scripts = res.container.getElementsByTagName("script");
                     for (let script of scripts) {
@@ -176,7 +176,7 @@ export default function createApp(p = {}) {
                 } else {
                     //throw Error
                 }
-            }
+            };
 
             // res.container (Html element) property are plus thing, usually there is not in the response
             // but is necessary for end render

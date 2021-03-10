@@ -71,21 +71,21 @@ function createWappMiddleware(p = {}) {
             enumerable: false,
             writable: false,
             value: wapp
-        })
+        });
 
         Object.defineProperty(wappRequest, "req", {
             ...defaultDescriptor,
             enumerable: false,
             writable: false,
             value: req
-        })
+        });
 
         Object.defineProperty(wappRequest, "res", {
             ...defaultDescriptor,
             enumerable: false,
             writable: false,
             value: res
-        })
+        });
 
         wappResponse.statusCode = res.statusCode;
         wappResponse.containerElementId = containerElementId;
@@ -97,21 +97,21 @@ function createWappMiddleware(p = {}) {
             enumerable: false,
             writable: false,
             value: wapp
-        })
+        });
 
         Object.defineProperty(wappResponse, "req", {
             ...defaultDescriptor,
             enumerable: false,
             writable: false,
             value: req
-        })
+        });
 
         Object.defineProperty(wappResponse, "res", {
             ...defaultDescriptor,
             enumerable: false,
             writable: false,
             value: res
-        })
+        });
 
 
 
@@ -120,14 +120,14 @@ function createWappMiddleware(p = {}) {
             enumerable: false,
             writable: false,
             value: wapp
-        })
+        });
 
         Object.defineProperty(req, "wappRequest", {
             ...defaultDescriptor,
             enumerable: false,
             writable: false,
             value: wappRequest
-        })
+        });
 
 
         Object.defineProperty(res, "wapp", {
@@ -135,20 +135,20 @@ function createWappMiddleware(p = {}) {
             enumerable: false,
             writable: false,
             value: wapp
-        })
+        });
 
         Object.defineProperty(res, "wappResponse", {
             ...defaultDescriptor,
             enumerable: false,
             writable: false,
             value: wappResponse
-        })
+        });
 
         wappResponse.status = function status(...attributes) {
 
             if (!wappResponse.sended) {
 
-                const http1 = (wappRequest.httpVersion === "1.1" || (wappRequest.httpVersion && Number(wappRequest.httpVersion.split(".")[0]) === 1))
+                const http1 = (wappRequest.httpVersion === "1.1" || (wappRequest.httpVersion && Number(wappRequest.httpVersion.split(".")[0]) === 1));
                 const tempStatusCode = wappResponse.statusCode;
                 const tempStatusMessage = wappResponse.statusMessage;
 
@@ -156,7 +156,7 @@ function createWappMiddleware(p = {}) {
                 const error = attributes[1];
                 const isError = !!(error && error.message && error.stack);
 
-                wappResponse.statusCode = statusCode
+                wappResponse.statusCode = statusCode;
 
                 if (statusCode) {
                     if (statusCode === 200) {
@@ -180,49 +180,49 @@ function createWappMiddleware(p = {}) {
 
             }
 
-        }
+        };
 
         wappResponse.send = function send(...attributes) {
             if (!wappResponse.sended) {
                 const [html, ...restAttr] = attributes;
                 wappResponse.sendData = {
                     data: html
-                }
+                };
                 wappMiddleware.runSendMiddlewares(req, res, function next() {
                     const endHtml = wappResponse.sendData?.data || "";
                     res.send(...[endHtml, ...restAttr]);
                     wappResponse.sended = true;
                 });
             }
-        }
+        };
 
         Object.defineProperty(res, "_originalEndFunction", {
             enumerable: false,
             writable: false,
             configurable: false,
             value: res.end
-        })
+        });
 
         res.end = function (...attributes) {
             res._originalEndFunction(...attributes);
             wappResponse.sended = true;
-        }
+        };
 
         Object.defineProperty(res, "_originalStatusFunction", {
             enumerable: false,
             writable: false,
             configurable: false,
             value: res.status
-        })
+        });
 
         res.status = function (...attributes) {
             if (!wappResponse.sended) {
                 res._originalStatusFunction(...attributes);
             }
-        }
+        };
 
         if (wapp.globals.DEV){
-            wapp.wappResponse = wappResponse
+            wapp.wappResponse = wappResponse;
             wapp.wappRequest = wappRequest
         }
 
@@ -232,7 +232,7 @@ function createWappMiddleware(p = {}) {
 
     function defaultHandle(req, res, out){
 
-        const handles = Object.keys(wappMiddleware.handles).sort().map(function (key) {return wappMiddleware.handles[key]})
+        const handles = Object.keys(wappMiddleware.handles).sort().map(function (key) {return wappMiddleware.handles[key]});
 
         let index = 0;
 
@@ -255,7 +255,7 @@ function createWappMiddleware(p = {}) {
 
     function defaultRunSendMiddlewares(req, res, out) {
         if (wappMiddleware.sendMiddlewares) {
-            const sendMiddlewares = Object.keys(wappMiddleware.sendMiddlewares).map(function (key) {return wappMiddleware.sendMiddlewares[key]})
+            const sendMiddlewares = Object.keys(wappMiddleware.sendMiddlewares).map(function (key) {return wappMiddleware.sendMiddlewares[key]});
             let index = 0;
             function next() {
                 if (sendMiddlewares[index]){
@@ -312,7 +312,7 @@ function createWappMiddleware(p = {}) {
             ...defaultDescriptor,
             value: {}
         },
-    })
+    });
 
     function wappMiddleware(req, res, next) {
         if (typeof wappMiddleware.handle === "function"){

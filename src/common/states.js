@@ -48,7 +48,7 @@ export function createDefaultStateManager(p = {}) {
                 }
             }
         },
-    })
+    });
     const defaultActions = Object.create(Object.prototype, {
         req: {
             ...defaultDescriptor,
@@ -74,13 +74,13 @@ export function createDefaultStateManager(p = {}) {
                 }
             }
         }
-    })
+    });
     const defaultRootReducer = function (newState, action) {
         Object.keys(stateManager.reducers).forEach(function(key){
             newState[key] = stateManager.reducers[key](newState[key], action)
-        })
+        });
         return newState;
-    }
+    };
 
     function createStore(rootReducer = defaultRootReducer, initialState = {}) {
 
@@ -88,7 +88,7 @@ export function createDefaultStateManager(p = {}) {
 
         Object.keys(initialState).forEach(function (key) {
             state[key] = initialState[key]
-        })
+        });
 
         return {
             getState: function() {
@@ -99,7 +99,7 @@ export function createDefaultStateManager(p = {}) {
                     state = {};
                     Object.keys(initialState).forEach(function (key) {
                         state[key] = initialState[key]
-                    })
+                    });
                     return JSON.parse(JSON.stringify(state));
                 }
             },
@@ -189,7 +189,7 @@ export function createDefaultStateManager(p = {}) {
             ...defaultDescriptor,
             value: defaultRunListeners
         }
-    })
+    });
 
     return stateManager;
 
@@ -299,7 +299,7 @@ export default function createStates(p = {}) {
                 containerElementId: containerElementId,
                 appStateName: appStateName
             }
-        }
+        };
 
         const init = statesMiddleware.shouldInitializedStore;
 
@@ -412,7 +412,7 @@ export default function createStates(p = {}) {
 
     function defaultHandle(req, res, out){
 
-        const statesMiddlewares = Object.keys(statesMiddleware.handles).sort().map(function (key) {return statesMiddleware.handles[key]})
+        const statesMiddlewares = Object.keys(statesMiddleware.handles).sort().map(function (key) {return statesMiddleware.handles[key]});
 
         let index = 0;
 
@@ -477,7 +477,7 @@ export default function createStates(p = {}) {
             ...defaultDescriptor,
             value: false
         },
-    })
+    });
 
     function statesMiddleware(req, res, out) {
         if (typeof statesMiddleware.handle === "function"){

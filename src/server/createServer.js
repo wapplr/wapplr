@@ -14,7 +14,7 @@ export default function createServer(p = {}) {
 
     const app = createApp({wapp});
 
-    const {config} = createConfig(p)
+    const {config} = createConfig(p);
     const serverConfig = config.server || {};
 
     const {port, portSSL, publicPath, assets = {}, credentials = {}, disableUseDefaultMiddlewares = false, ...rest} = serverConfig;
@@ -61,7 +61,7 @@ export default function createServer(p = {}) {
                 return scripts
             }
         }
-    })
+    });
 
     const defaultCredentials = Object.create(Object.prototype, {
         key: {
@@ -72,7 +72,7 @@ export default function createServer(p = {}) {
             ...defaultDescriptor,
             value: credentials.cert
         }
-    })
+    });
 
     const defaultConfig = Object.create(Object.prototype, {
         port: {
@@ -101,7 +101,7 @@ export default function createServer(p = {}) {
             ...defaultDescriptor,
             value: disableUseDefaultMiddlewares
         },
-    })
+    });
 
     mergeProperties(defaultConfig, wapp.config);
     mergeProperties(defaultConfig, rest);
@@ -111,7 +111,7 @@ export default function createServer(p = {}) {
             ...defaultDescriptor,
             value: http.createServer(app)
         }
-    })
+    });
 
     function defaultListen() {
 
@@ -166,7 +166,7 @@ export default function createServer(p = {}) {
             if (httpServer && httpServer.listening) {
                 shouldClose.push(httpServer);
             }
-        })
+        });
 
         let closed = 0;
 
@@ -175,18 +175,18 @@ export default function createServer(p = {}) {
                 closed = closed + 1;
                 servers[port] = null;
             });
-        })
+        });
 
         function waiting() {
             if (shouldClose.length === closed) {
-                clearInterval(int)
+                clearInterval(int);
                 if (callback) {
                     callback();
                 }
             }
         }
 
-        const int = setInterval(waiting,1)
+        const int = setInterval(waiting,1);
         waiting();
 
     }
@@ -238,7 +238,7 @@ export default function createServer(p = {}) {
 
         if (!wapplrServer.config.disableUseDefaultMiddlewares){
 
-            const middlewares = Object.keys(wapplrServer.middlewares).map(function (key) { return wapplrServer.middlewares[key] })
+            const middlewares = Object.keys(wapplrServer.middlewares).map(function (key) { return wapplrServer.middlewares[key] });
             let index = 0;
 
             async function next(err) {
@@ -266,12 +266,12 @@ export default function createServer(p = {}) {
 
         return await out();
 
-    })
+    });
 
     if (!process._addedUnhandledExceptions) {
 
         function wapplrUnhandledHandler(err) {
-            console.log(err)
+            console.log(err);
             wapplrServer.close(function () {
                 process.exit(1);
             })

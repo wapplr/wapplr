@@ -26,7 +26,7 @@ export default function html({wapp, req, res}) {
     description = (description) ? description : (title && title.split) ? title.split(" | ")[0] : title;
 
     if (typeof author === "function") {author = author({wapp, req, res})}
-    author = (author || siteName)
+    author = (author || siteName);
 
     if (typeof render === "function") {render = render({wapp, req, res})}
 

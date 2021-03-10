@@ -58,14 +58,14 @@ function createDefaultContentManager(p = {}) {
                 return (author) ? author : siteName;
             }
         }
-    })
+    });
 
     const defaultContents = Object.create(Object.prototype, {
         log: {
             ...defaultDescriptor,
             value: defaultContentValues
         },
-    })
+    });
 
     function defaultAdd(obj) {
         if (typeof obj === "object" && !obj.length){
@@ -86,7 +86,7 @@ function createDefaultContentManager(p = {}) {
         return contentManager.contents[contentName]
     }
 
-    const defaultComponents =  Object.create(Object.prototype, {})
+    const defaultComponents =  Object.create(Object.prototype, {});
 
     function defaultAddComponent(obj) {
         if (typeof obj === "object" && !obj.length){
@@ -140,7 +140,7 @@ function createDefaultContentManager(p = {}) {
             ...defaultDescriptor,
             value: defaultGetComponent
         }
-    })
+    });
     return contentManager;
 
 }
@@ -198,7 +198,7 @@ export default function createContents(p = {}) {
             ...defaultDescriptor,
             value: defaultGetComponent
         }
-    })
+    });
 
     async function contentsMiddleware(req, res, next) {
         if (typeof contentsMiddleware.handle === "function") {

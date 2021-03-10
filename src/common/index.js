@@ -30,7 +30,7 @@ export default function createWapp(p = {}) {
             ...defaultDescriptor,
             value: lang
         }
-    })
+    });
 
     mergeProperties(defaultConfig, rest);
 
@@ -55,14 +55,14 @@ export default function createWapp(p = {}) {
             ...defaultDescriptor,
             value: globalConfig.ROOT
         }
-    })
+    });
 
-    const defaultTarget = ("undefined" == typeof window) ? "node" : "web"
+    const defaultTarget = ("undefined" == typeof window) ? "node" : "web";
 
     const defaultGetTargetObject = function (){
         const target = (wapp.target === "node") ? "server" : "client";
         return wapp[target];
-    }
+    };
 
     const wapp = Object.create(Object.prototype, {
         config: {

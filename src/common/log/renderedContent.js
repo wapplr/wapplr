@@ -54,7 +54,7 @@ function getContent(p) {
                     if (header){
                         header.classList.toggle("${templateStyle.sticky}", window.scrollY > 0 )
                     }
-                })
+                });
                 if (${typeof toConsole === "string"}){
                     console.log(\`${toConsole}\`);
                 }

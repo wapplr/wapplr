@@ -23,7 +23,7 @@ export function createRenderMiddleware(p = {}) {
 
     async function defaultHandle(req, res, out){
 
-        const statesMiddlewares = Object.keys(renderMiddleware.handles).map(function (key) {return renderMiddleware.handles[key]})
+        const statesMiddlewares = Object.keys(renderMiddleware.handles).map(function (key) {return renderMiddleware.handles[key]});
 
         let index = 0;
 
@@ -88,7 +88,7 @@ export function createRenderMiddleware(p = {}) {
             ...defaultDescriptor,
             value: defaultAddHandle
         },
-    })
+    });
 
     function renderMiddleware(req, res, next) {
         if (typeof renderMiddleware.handle === "function"){
@@ -147,7 +147,7 @@ export function createUpdateTagsMiddleware(p = {}) {
             description = (description) ? description : (title && title.split) ? title.split(" | ")[0] : title;
 
             if (typeof author === "function") {author = author({wapp, req, res})}
-            author = (author || siteName)
+            author = (author || siteName);
 
             document.title = title;
 
@@ -163,7 +163,7 @@ export function createUpdateTagsMiddleware(p = {}) {
             ...defaultDescriptor,
             value: defaultHandle
         },
-    })
+    });
 
     function tagsMiddleware(req, res, next) {
         if (typeof tagsMiddleware.handle === "function"){
@@ -216,7 +216,7 @@ export function createAddOnClickToATagsMiddleware(p = {}) {
             ...defaultDescriptor,
             value: defaultHandle
         },
-    })
+    });
 
     function onClickMiddleware(req, res, next) {
         if (typeof onClickMiddleware.handle === "function"){

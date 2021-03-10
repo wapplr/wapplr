@@ -4,18 +4,18 @@ function createDefaultRequestManager(p = {}) {
 
     const {wapp} = p;
 
-    const defaultRequests = Object.create(Object.prototype, {})
+    const defaultRequests = Object.create(Object.prototype, {});
 
     function defaultGetHTTPOptions(p = {}) {
         const {bodyJson = {}, options = {}} = p;
         return {
-            method: 'post',
+            method: "post",
             headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
+                Accept: "application/json",
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(bodyJson),
-            credentials: 'same-origin',
+            credentials: "same-origin",
             ...options
         }
     }
@@ -52,7 +52,7 @@ function createDefaultRequestManager(p = {}) {
 
         const {requestName, req} = p;
 
-        const request = (requestName && requestManager.requests[requestName]) ? requestManager.requests[requestName] : (p.request) ? p.request : null
+        const request = (requestName && requestManager.requests[requestName]) ? requestManager.requests[requestName] : (p.request) ? p.request : null;
 
         const {url, options = {}} = request;
         const {body, getBody} = options;
@@ -67,7 +67,6 @@ function createDefaultRequestManager(p = {}) {
         let response = null;
 
         try {
-
             response = await fetch(url, {
                 ...options,
                 body: requestBody,
@@ -119,7 +118,7 @@ function createDefaultRequestManager(p = {}) {
             writable: false,
             value: defaultRequests
         }
-    })
+    });
 
     return requestManager;
 
@@ -160,7 +159,7 @@ export default function createRequests(p = {}) {
             ...defaultDescriptor,
             value: requestManager
         }
-    })
+    });
 
     function requestsMiddleware(req, res, next) {
         if (typeof requestsMiddleware.handle === "function"){

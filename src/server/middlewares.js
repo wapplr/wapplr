@@ -53,7 +53,7 @@ export function createRenderMiddleware(p = {}) {
             })
         }
 
-        const renderMiddlewares = Object.keys(renderMiddleware.handles).map(function (key) {return renderMiddleware.handles[key]})
+        const renderMiddlewares = Object.keys(renderMiddleware.handles).map(function (key) {return renderMiddleware.handles[key]});
         renderMiddlewares.sort();
 
         let index = 0;
@@ -108,7 +108,7 @@ export function createRenderMiddleware(p = {}) {
             ...defaultDescriptor,
             value: defaultAddHandle
         },
-    })
+    });
 
     function renderMiddleware(req, res, next) {
         if (typeof renderMiddleware.handle === "function"){
@@ -140,9 +140,9 @@ export function createNotModifiedMiddleware(p = {}) {
         const lastModified = res.getHeader("last-modified");
 
         const conditionalGet = ifMatch || ifUnmodifiedSince || ifNoneMatch || ifModifiedSince;
-        const isCacheable = ((res.wappResponse.statusCode >= 200 && res.wappResponse.statusCode < 300) || res.wappResponse.statusCode === 304)
-        const noCache = (cacheControl && /(?:^|,)\s*?no-cache\s*?(?:,|$)/.test(cacheControl))
-        const unconditional = (!ifUnmodifiedSince && !ifNoneMatch)
+        const isCacheable = ((res.wappResponse.statusCode >= 200 && res.wappResponse.statusCode < 300) || res.wappResponse.statusCode === 304);
+        const noCache = (cacheControl && /(?:^|,)\s*?no-cache\s*?(?:,|$)/.test(cacheControl));
+        const unconditional = (!ifUnmodifiedSince && !ifNoneMatch);
 
         if (unconditional || noCache || !isCacheable || !conditionalGet) {
             return false;
@@ -153,9 +153,9 @@ export function createNotModifiedMiddleware(p = {}) {
         if (ifNoneMatch && ifNoneMatch !== "*" && etag) {
 
             function parseTokenList(str) {
-                let end = 0
-                const list = []
-                let start = 0
+                let end = 0;
+                const list = [];
+                let start = 0;
 
                 for (let i = 0, len = str.length; i < len; i++) {
                     switch (str.charCodeAt(i)) {
@@ -163,18 +163,18 @@ export function createNotModifiedMiddleware(p = {}) {
                             if (start === end) {
                                 start = end = i + 1
                             }
-                            break
+                            break;
                         case 0x2c: /* , */
-                            list.push(str.substring(start, end))
-                            start = end = i + 1
-                            break
+                            list.push(str.substring(start, end));
+                            start = end = i + 1;
+                            break;
                         default:
-                            end = i + 1
+                            end = i + 1;
                             break
                     }
                 }
 
-                list.push(str.substring(start, end))
+                list.push(str.substring(start, end));
 
                 return list
 
@@ -183,7 +183,7 @@ export function createNotModifiedMiddleware(p = {}) {
             const matches = parseTokenList(ifNoneMatch);
 
             for (let i = 0; i < matches.length; i++) {
-                const match = matches[i]
+                const match = matches[i];
                 if (match === etag || match === "W/" + etag || "W/" + match === etag) {
                     fromCache = true;
                     break
@@ -195,7 +195,7 @@ export function createNotModifiedMiddleware(p = {}) {
         if (ifModifiedSince && lastModified) {
 
             function parseHttpDate (date) {
-                const timestamp = date && Date.parse(date)
+                const timestamp = date && Date.parse(date);
                 return typeof timestamp === 'number' ? timestamp : NaN
             }
 
@@ -231,7 +231,7 @@ export function createNotModifiedMiddleware(p = {}) {
             ...defaultDescriptor,
             value: defaultIsFromCache
         }
-    })
+    });
 
     function notModifiedMiddleware(req, res, next) {
         if (typeof notModifiedMiddleware.handle === "function"){
@@ -290,7 +290,7 @@ export default function createMiddlewares(p) {
                 const {stats = {}} = sendData;
                 const {mtime, size} = stats;
                 if (!res.getHeader("ETag") && mtime && size){
-                    const etag = `W/"${size.toString(16)}-${mtime.getTime().toString(16)}"`
+                    const etag = `W/"${size.toString(16)}-${mtime.getTime().toString(16)}"`;
                     res.setHeader("ETag", etag)
                 }
             }
@@ -302,13 +302,13 @@ export default function createMiddlewares(p) {
                 if (fromCache) {
                     res.wappResponse.status(304);
                     res.wapp.log(req, res);
-                    res.end()
+                    res.end();
                     return;
                 }
             }
             return next();
         }
-    })
+    });
 
     return {
         ...rest,

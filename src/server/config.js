@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import getCommonConfig from '../common/config';
+import getCommonConfig from "../common/config";
 
 export default function getConfig(p = {}){
 
@@ -18,10 +18,10 @@ export default function getConfig(p = {}){
 
     try {
         if (!assets && fs.existsSync(path.resolve(dirname, "./asset-manifest.json"))){
-            assets = JSON.parse(fs.readFileSync(path.resolve(dirname, "./asset-manifest.json"), 'utf-8'))
+            assets = JSON.parse(fs.readFileSync(path.resolve(dirname, "./asset-manifest.json"), "utf-8"))
         }
         if (fs.existsSync(path.resolve(dirname, "./chunk-manifest.json"))){
-            const chunks = JSON.parse(fs.readFileSync(path.resolve(dirname, "./chunk-manifest.json"), 'utf-8'))
+            const chunks = JSON.parse(fs.readFileSync(path.resolve(dirname, "./chunk-manifest.json"), "utf-8"));
             if (chunks) {
                 assets.chunks = {...chunks}
             }
@@ -29,11 +29,11 @@ export default function getConfig(p = {}){
     } catch (e) {}
 
     try {
-        const credentialsFolder = "secure/"
+        const credentialsFolder = "secure/";
         if (!credentials && fs.existsSync(path.resolve(dirname, credentialsFolder, "localhost.key"))  && fs.existsSync(path.resolve(dirname, credentialsFolder, "localhost.crt")) ){
             credentials = {
-                key: fs.readFileSync(path.resolve(dirname, credentialsFolder, "localhost.key"), 'utf8'),
-                cert: fs.readFileSync(path.resolve(dirname, credentialsFolder, "localhost.crt"), 'utf8'),
+                key: fs.readFileSync(path.resolve(dirname, credentialsFolder, "localhost.key"), "utf8"),
+                cert: fs.readFileSync(path.resolve(dirname, credentialsFolder, "localhost.crt"), "utf8"),
             }
         }
     } catch (e) {}
@@ -45,7 +45,7 @@ export default function getConfig(p = {}){
         publicPath: path.resolve(dirname, "public"),
         assets: assets,
         credentials: credentials
-    }
+    };
 
     return {
         config: {

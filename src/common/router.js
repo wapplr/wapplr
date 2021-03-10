@@ -36,7 +36,7 @@ export function createDefaultRouter(p = {}) {
                                 thisParams[rpas.slice(1)] = pa[i]
                             }
                         }
-                    })
+                    });
                     if (pa.length > rpa.length && !wasAllowChar) {
                         allPartIsMatch = false;
                     }
@@ -117,7 +117,7 @@ export function createDefaultRouter(p = {}) {
                         if (aRoute.path === route.path) {
                             foundRoute = true;
                         }
-                    })
+                    });
                     if (!foundRoute) {
                         router.routes.push(route)
                     }
@@ -130,7 +130,7 @@ export function createDefaultRouter(p = {}) {
                     if (aRoute.path === obj.path) {
                         foundRoute = true;
                     }
-                })
+                });
                 if (!foundRoute) {
                     router.routes.push(obj)
                 }
@@ -148,7 +148,7 @@ export function createDefaultRouter(p = {}) {
                             router.routes[i] = objRoute;
                             replaced = true
                         }
-                    })
+                    });
                     if (!replaced) {
                         router.routes.push(objRoute)
                     }
@@ -162,7 +162,7 @@ export function createDefaultRouter(p = {}) {
                         router.routes[i] = obj;
                         replaced = true;
                     }
-                })
+                });
                 if (!replaced) {
                     router.routes.push(obj)
                 }
@@ -210,7 +210,7 @@ export function createDefaultRouter(p = {}) {
             ...defaultDescriptor,
             value: defaultReplace
         }
-    })
+    });
 
     return router;
 
@@ -272,7 +272,7 @@ export default function createRouter(p = {}) {
             ...defaultDescriptor,
             value: defaultReplace
         }
-    })
+    });
 
     async function routerMiddleware(req, res, next) {
         if (typeof routerMiddleware.handle === "function"){

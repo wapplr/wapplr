@@ -7,7 +7,7 @@ export default function createApp(p = {}) {
 
     const {wapp} = p;
 
-    const defaultConfig = Object.create(Object.prototype, {})
+    const defaultConfig = Object.create(Object.prototype, {});
 
     const defaultMiddlewares = [
         function next(req, res, next) {
@@ -16,7 +16,7 @@ export default function createApp(p = {}) {
             }
             return null;
         }
-    ]
+    ];
 
     function defaultErrorHandler(err, req, res, next) {
 
@@ -41,7 +41,7 @@ export default function createApp(p = {}) {
             title: err.message + " | " + siteName,
             text: text.split("\n")[0],
             toConsole: JSON.stringify(text.split("[500]")[0] + "[500] " + err.stack.replace("Error: ", ""))
-        })
+        });
 
         res.send(renderedContent);
 
@@ -98,7 +98,7 @@ export default function createApp(p = {}) {
 
         fns.forEach(function (fn, i){
             middlewares.push(fn)
-        })
+        });
 
         return this;
     }
@@ -110,7 +110,7 @@ export default function createApp(p = {}) {
             }
             next();
         }
-        app.use(post)
+        app.use(post);
         return this;
     }
 
@@ -121,7 +121,7 @@ export default function createApp(p = {}) {
             }
             next();
         }
-        app.use(get)
+        app.use(get);
         return this;
     }
 
@@ -160,7 +160,7 @@ export default function createApp(p = {}) {
             ...defaultDescriptor,
             value: serveStatic
         }
-    })
+    });
 
     async function app(req = {}, res = {}, next) {
 
@@ -204,7 +204,7 @@ export default function createApp(p = {}) {
 
             if (!res.json) {
                 res.json = function (json) {
-                    res.setHeader('Content-Type', 'application/json')
+                    res.setHeader('Content-Type', 'application/json');
                     res.send(JSON.stringify(json))
                 }
             }
