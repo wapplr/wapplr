@@ -91,15 +91,9 @@ export function createDefaultRouter(p = {}) {
 
     async function defaultResolve(p = {}) {
         const {path, req, res} = p;
-        const {action, ...rest} = router.getRoute({path});
-        let r = {...rest};
-        if (action) {
-            r =  await action({wapp, req, res, ...rest});
-        }
-        if (router.action){
-            const routerAction = router.action;
-            r = await routerAction({wapp, req, res, ...rest})
-        }
+        const {action = defaultAction, ...rest} = router.getRoute({path});
+        let r = await action({wapp, req, res, ...rest});
+        r = await router.action({wapp, req, res, ...r});
         return r;
     }
 
@@ -232,7 +226,6 @@ export default function createRouter(p = {}) {
 
         wappResponse.statusCode = (wappResponse.statusCode === 200 || !wappResponse.statusCode) ? route.status : wappResponse.statusCode;
         wappResponse.route = route;
-        wappResponse.content = route.content;
 
         if (wappResponse.statusCode) {
             wappResponse.status(wappResponse.statusCode);

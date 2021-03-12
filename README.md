@@ -139,7 +139,7 @@ This state what the server side render will put to the html body, and the client
 - Render: it renders the content if that is exists: on server side it set headers and send response. On client side change the container content. 
 - Log: log some data
 
-## HOC - Server side initialize
+## Server side initialize
 
 This example show you how can create a reusable module with a server what you can use as a main process or a middleware too.
 If you want to start or build with wapplr-cli need to:
@@ -206,7 +206,7 @@ if (typeof RUN !== "undefined" && RUN === "my-package") {
 }
 ```
 
-## HOC - Client side initialize
+## Client side initialize
 
 This example show you how can create a reusable module with a client what you can use as a main process or a middleware too.
 If you want to start or build with wapplr-cli need to:
