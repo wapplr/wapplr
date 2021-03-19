@@ -54,6 +54,10 @@ export default function createWapp(p = {}) {
         ROOT: {
             ...defaultDescriptor,
             value: globalConfig.ROOT
+        },
+        NAME: {
+            ...defaultDescriptor,
+            value: globalConfig.NAME
         }
     });
 
