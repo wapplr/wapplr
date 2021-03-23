@@ -11,7 +11,25 @@ export function createMiddleware(p = {}) {
     return wapp.client.app;
 }
 
-export function run(p = {}) {
+const defaultConfig = {
+    config: {
+        globals: {
+            DEV: (typeof DEV !== "undefined") ? DEV : undefined,
+            WAPP: (typeof WAPP !== "undefined") ? WAPP : undefined,
+            RUN: (typeof RUN !== "undefined") ? RUN : undefined,
+            TYPE: (typeof TYPE !== "undefined") ? TYPE : undefined,
+            ROOT: (typeof ROOT !== "undefined") ? ROOT : "/",
+            NAME: (typeof NAME !== "undefined") ? NAME : undefined,
+        }
+    }
+};
+
+export function run(p) {
+
+    if (p?.config?.globals && !p.config.globals.RUN){
+        p.config.globals.RUN = p.config?.globals.NAME || "wapplr";
+    }
+
     const wapp = createClient(p);
     const globals = wapp.globals;
     const {DEV} = globals;

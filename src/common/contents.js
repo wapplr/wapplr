@@ -9,7 +9,7 @@ function createDefaultContentManager(p = {}) {
         const {contentName} = route;
         const contents = contentManager.contents;
         const content = (contentName && contents[contentName]) ? {...contents[contentName]} : null;
-        if (content.request){
+        if (content && content.request){
             await content.request({wapp, req, res});
         }
         return content;

@@ -18,15 +18,18 @@ function createHistoryManager() {
 
     const globalHistory = window.history;
 
-    function defaultAddListener(obj) {
-        if (typeof obj === "object" && !obj.length){
-            Object.keys(obj).forEach(function (handleName) {
-                const handle = obj[handleName];
-                if (typeof handle == "function") {
-                    history.listeners[handleName] = handle
-                }
-            })
+    let li = 0;
+
+    function defaultAddListener(handle) {
+        if (typeof handle == "function") {
+            const handleName = li.toString();
+            history.listeners[handleName] = handle;
+            li = li + 1;
+            return function removeListener() {
+                delete history.listeners[handleName];
+            }
         }
+        return function removeListener() {}
     }
 
     function defaultRunListeners(args) {
@@ -71,6 +74,7 @@ function createHistoryManager() {
             window.removeEventListener("popstate", history.handlePop);
             history.initialized = false;
         }
+        history.listeners = {};
         return history;
     }
 
@@ -126,10 +130,7 @@ function createHistoryManager() {
     function defaultListen(...attributes) {
         const fn = (attributes[0]) ? attributes[0] : null;
         history.init();
-        if (fn){
-            const nI = Object.keys(history.listeners).length;
-            history.addListener({[nI.toString()]: fn});
-        }
+        return history.addListener(fn);
     }
 
     const history = Object.create(Object.prototype, {
@@ -153,9 +154,8 @@ function createHistoryManager() {
         },
         listeners: {
             ...defaultDescriptor,
-            writable: false,
             enumerable: false,
-            value: []
+            value: {}
         },
         runListeners: {
             ...defaultDescriptor,

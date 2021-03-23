@@ -7,12 +7,12 @@ export default function getConfig(p = {}){
 
     const globals = {
         ...globalsConfig,
-        DEV: (typeof DEV !== "undefined") ? DEV : (typeof globalsConfig.DEV !== "undefined") ? globalsConfig.DEV : false,
-        WAPP: (typeof WAPP !== "undefined") ? WAPP : (typeof globalsConfig.WAPP !== "undefined") ? globalsConfig.WAPP : "buildHash",
-        RUN: (typeof RUN !== "undefined") ? RUN : (typeof globalsConfig.RUN !== "undefined") ? globalsConfig.RUN : "",
-        TYPE: (typeof TYPE !== "undefined") ? TYPE : (typeof globalsConfig.TYPE !== "undefined") ? globalsConfig.TYPE : "",
-        ROOT: (typeof ROOT !== "undefined") ? ROOT : (typeof globalsConfig.ROOT !== "undefined") ? globalsConfig.ROOT : (typeof __dirname !== "undefined") ? __dirname : "/",
-        NAME: (typeof NAME !== "undefined") ? NAME : (typeof globalsConfig.NAME !== "undefined") ? globalsConfig.NAME : "",
+        DEV: (typeof globalsConfig.DEV !== "undefined") ? globalsConfig.DEV : (typeof DEV !== "undefined") ? DEV : false,
+        WAPP: (typeof globalsConfig.WAPP !== "undefined") ? globalsConfig.WAPP : (typeof WAPP !== "undefined") ? WAPP : "buildHash",
+        RUN: (typeof globalsConfig.RUN !== "undefined") ? globalsConfig.RUN : (typeof RUN !== "undefined") ? RUN : "",
+        TYPE: (typeof globalsConfig.TYPE !== "undefined") ? globalsConfig.TYPE : (typeof TYPE !== "undefined") ? TYPE : "",
+        ROOT: (typeof globalsConfig.ROOT !== "undefined") ? globalsConfig.ROOT : (typeof ROOT !== "undefined") ? ROOT : (typeof __dirname !== "undefined") ? __dirname : "/",
+        NAME: (typeof globalsConfig.NAME !== "undefined") ? globalsConfig.NAME : (typeof NAME !== "undefined") ? NAME : "",
     };
 
     const common = {

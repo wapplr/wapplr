@@ -84,7 +84,7 @@ export default function createApp(p = {}) {
         const fns = (typeof fn === "function") ? [fn] : (typeof fn === "object"&& fn.length) ? fn : [];
 
         if (fns.length === 0) {
-            throw new TypeError('app.use() requires a middleware function')
+            throw new TypeError("app.use() requires a middleware function")
         }
 
         const middlewares = app.middlewares;
@@ -168,7 +168,7 @@ export default function createApp(p = {}) {
                         const parent = script.parentElement;
                         const innerHTML = script.innerHTML;
                         parent.removeChild(script);
-                        const newScript = document.createElement('script');
+                        const newScript = document.createElement("script");
                         newScript.type = "text/javascript";
                         newScript.innerHTML = innerHTML;
                         parent.append(newScript)
