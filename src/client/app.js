@@ -143,10 +143,12 @@ export default function createApp(p = {}) {
             req.method = req.method || "GET";
             req.httpVersion = req.httpVersion || "1.1";
 
-            try {
-                const fullUrl = req.protocol + "://" + req.hostname + req.url;
-                req.query = Object.fromEntries(new URL(fullUrl).searchParams);
-            } catch (e) {}
+            if (!req.query) {
+                try {
+                    const fullUrl = req.protocol + "://" + req.hostname + req.url;
+                    req.query = Object.fromEntries(new URL(fullUrl).searchParams);
+                } catch (e) {}
+            }
 
             res.statusCode = (res.statusCode) ? res.statusCode : 200;
 
