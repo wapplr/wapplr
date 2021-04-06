@@ -44,7 +44,7 @@ function createWappMiddleware(p = {}) {
         }
 
         if (!req.remoteAddress) {
-            req.remoteAddress = ((req.headers && req.headers['x-forwarded-for']) || '').split(',').pop().trim() || (req.socket && req.socket.remoteAddress) || "::1"
+            req.remoteAddress = ((req.headers && req.headers["x-forwarded-for"]) || "").split(",").pop().trim() || (req.socket && req.socket.remoteAddress) || "::1"
         }
 
         if (wapp.target === "web" && container) {
@@ -60,8 +60,8 @@ function createWappMiddleware(p = {}) {
         wappRequest.method = req.method;
         wappRequest.httpVersion = req.httpVersion;
         wappRequest.hostname = (req.headers && req.headers.host) ? req.headers.host : (req.authority) ? req.authority : req.hostname;
-        wappRequest.protocol = (wappRequest.httpVersion && wappRequest.httpVersion.startsWith("2")) ? "https" : req.protocol;
-        wappRequest.secure = req.secure;
+        wappRequest.protocol = ((wappRequest.httpVersion && wappRequest.httpVersion.startsWith("2")) || (req.headers && req.headers["x-forwarded-proto"])) ? "https" : req.protocol;
+        wappRequest.secure = (wappRequest.protocol === "https") ? true : req.secure;
         wappRequest.remoteAddress = req.remoteAddress;
         wappRequest.userAgent = (req.headers && req.headers["user-agent"]) ? req.headers["user-agent"] : (typeof window !== "undefined" && window.navigator) ? window.navigator.userAgent : "";
         wappRequest.query = req.query;
