@@ -17,7 +17,7 @@ export default function getConfig(p = {}){
 
     const common = {
         ...commonConfig,
-        containerElementId: (typeof globals.WAPP !== "undefined" && globals.WAPP) ? (typeof globals.DEV !== "undefined" && globals.DEV) ? "wapplr-container-element-id-"+ globals.WAPP : globals.WAPP : "app",
+        containerElementId: (typeof globals.WAPP !== "undefined" && globals.WAPP) ? (typeof globals.DEV !== "undefined" && globals.DEV) ? "wapplr-container-element-id-"+ globals.WAPP : "app-"+globals.WAPP : "app",
         appStateName: (typeof globals.WAPP !== "undefined" && globals.WAPP) ? (typeof globals.DEV !== "undefined" && globals.DEV) ? "WAPPLR_APP_STATE_" + globals.WAPP : globals.WAPP : "APP_STATE",
         siteName: commonConfig.siteName || "Wapplr",
         lang: commonConfig.lang || "en"
