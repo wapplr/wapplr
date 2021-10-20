@@ -33,7 +33,8 @@ export function copyObject(obj) {
         });
     }
 
-    const type = Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+    const transformedObject = obj && obj.toJSON ? obj.toJSON() : obj;
+    const type = Object.prototype.toString.call(transformedObject).slice(8, -1).toLowerCase();
 
     if (type === "object") {
         return cloneObj();
