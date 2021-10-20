@@ -14,3 +14,35 @@ export const defaultDescriptor = {
     enumerable: true,
     configurable: false,
 };
+
+export function copyObject(obj) {
+    
+    function cloneObj() {
+        const clone = {};
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                clone[key] = copyObject(obj[key]);
+            }
+        }
+        return clone;
+    }
+
+    function cloneArr() {
+        return obj.map(function (item) {
+            return copyObject(item);
+        });
+    }
+
+    const type = Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+
+    if (type === "object") {
+        return cloneObj();
+    }
+
+    if (type === "array") {
+        return cloneArr();
+    }
+
+    return obj;
+
+}

@@ -141,7 +141,6 @@ export default function createRequests(p = {}) {
                 name: "responses",
                 value: response
             }));
-            res.wappResponse.state = res.wappResponse.store.getState();
         }
         return response;
     }

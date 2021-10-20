@@ -15,7 +15,7 @@ function createDefaultContentManager(p = {}) {
         return content;
     }
 
-    function getTitle({wapp, req, res}) {
+    function getTitle({wapp, res}) {
         const config = wapp.getTargetObject().config;
         const {siteName = "Wapplr"} = config;
         const {statusCode, statusMessage, errorMessage} = res.wappResponse;
@@ -52,7 +52,7 @@ function createDefaultContentManager(p = {}) {
         },
         author: {
             ...defaultDescriptor,
-            value: function author({wapp, req, res}) {
+            value: function author({wapp}) {
                 const config = wapp.getTargetObject().config;
                 const {author, siteName = "Wapplr"} = config;
                 return (author) ? author : siteName;

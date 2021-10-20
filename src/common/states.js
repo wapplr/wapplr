@@ -1,4 +1,4 @@
-import {defaultDescriptor, mergeProperties} from "./utils";
+import {defaultDescriptor, mergeProperties, copyObject} from "./utils";
 
 export function createDefaultStateManager(p = {}) {
 
@@ -12,7 +12,7 @@ export function createDefaultStateManager(p = {}) {
                     case "SET_REQ":
                         return {
                             ...state,
-                            [action.payload.name]: action.payload.value,
+                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copyObject(action.payload.value) : action.payload.value,
                         };
                     default:
                         return state;
@@ -26,7 +26,7 @@ export function createDefaultStateManager(p = {}) {
                     case "SET_RES":
                         return {
                             ...state,
-                            [action.payload.name]: action.payload.value,
+                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copyObject(action.payload.value) : action.payload.value,
                         };
                     case "INS_RES":
                         if (typeof action.payload.value === "object" && action.payload.value &&
@@ -35,13 +35,13 @@ export function createDefaultStateManager(p = {}) {
                                 ...state,
                                 [action.payload.name]: {
                                     ...state[action.payload.name],
-                                    ...action.payload.value
+                                    ...copyObject(action.payload.value)
                                 },
                             };
                         }
                         return {
                             ...state,
-                            [action.payload.name]: action.payload.value,
+                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copyObject(action.payload.value) : action.payload.value,
                         };
                     default:
                         return state;
@@ -85,45 +85,63 @@ export function createDefaultStateManager(p = {}) {
     function createStore(rootReducer = defaultRootReducer, initialState = {}) {
 
         let state = {};
+        let cachedString = "";
 
         Object.keys(initialState).forEach(function (key) {
             state[key] = initialState[key]
         });
 
         return {
-            getState: function() {
+            getState: function(p) {
+
+                const keys = p && typeof p == "string" ? p : p && typeof p == "object" && typeof p.keys == "string" ? p.keys : "";
+
+                if (keys){
+                    let found;
+                    function find(keys, o, i = 0) {
+                        if (keys[i+1] && keys[i] && o[keys[i]] && typeof o[keys[i]] == "object") {
+                            find(keys, o[keys[i]], i+1);
+                        } else if (!keys[i+1] && typeof o[keys[i]] !== "undefined"){
+                            found = o[keys[i]];
+                        }
+                    }
+                    find(keys.split("."), state);
+                    return (typeof found === "object" && found) ? copyObject(found) : found;
+                }
+
                 try{
-                    return JSON.parse(JSON.stringify(state));
+                    if (!cachedString){
+                        cachedString = JSON.stringify(state);
+                    }
+                    return JSON.parse(cachedString);
                 } catch (e){
                     console.log(e);
                     state = {};
                     Object.keys(initialState).forEach(function (key) {
                         state[key] = initialState[key]
                     });
-                    return JSON.parse(JSON.stringify(state));
+                    cachedString = JSON.stringify(state);
+                    return JSON.parse(cachedString);
                 }
             },
             dispatch: function(action) {
-                let newState = this.getState();
                 try {
-                    newState = rootReducer(newState, action);
+                    rootReducer(state, action);
+                } catch (e) {
+                    console.log(e);
+                }
+                cachedString = "";
+                try {
+                    stateManager.runListeners(action);
                 } catch (e) {
                     console.log(e)
                 }
-                try {
-                    Object.keys(newState).forEach(function (key){
-                        state[key] = newState[key]
-                    })
-                } catch (e) {
-                    console.log(e)
-                }
-                stateManager.runListeners(newState, action);
-                return state;
             },
             subscribe: function (listener) {
                 return stateManager.addListener(listener)
             }
-        }
+        };
+
     }
 
     function defaultAddListener(listener) {
@@ -139,10 +157,10 @@ export function createDefaultStateManager(p = {}) {
         }
     }
 
-    function defaultRunListeners(newState, action) {
+    function defaultRunListeners(action) {
         const listeners = [...stateManager.listeners];
         listeners.forEach(function (listener) {
-            listener(newState, action)
+            listener(action)
         })
     }
 
@@ -316,95 +334,90 @@ export default function createStates(p = {}) {
             if (wapp.target === "web"){
                 lastStoreForClient = wappResponse.store;
             }
-
         }
 
-        const stateBefore = store.getState();
-
         if (!init || (init && initState.req.timestamp !== timestamp)) {
-            if (stateBefore.req.timestamp !== timestamp) {
+            if (store.getState("req.timestamp") !== timestamp) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "timestamp", value: timestamp}))
             }
         }
         if (!init || (init && initState.req.path !== path)) {
-            if (stateBefore.req.path !== path) {
+            if (store.getState("req.path") !== path) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "path", value: path}))
             }
         }
         if (!init || (init && initState.req.url !== url)) {
-            if (stateBefore.req.url !== url) {
+            if (store.getState("req.url") !== url) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "url", value: url}))
             }
         }
         if (!init || (init && initState.req.method !== method)) {
-            if (stateBefore.req.method !== method) {
+            if (store.getState("req.method") !== method) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "method", value: method}))
             }
         }
         if (!init || (init && initState.req.httpVersion !== httpVersion)) {
-            if (stateBefore.req.httpVersion !== httpVersion) {
+            if (store.getState("req.httpVersion") !== httpVersion) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "httpVersion", value: httpVersion}))
             }
         }
         if (!init || (init && initState.req.hostname !== hostname)) {
-            if (stateBefore.req.hostname !== hostname) {
+            if (store.getState("req.hostname") !== hostname) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "hostname", value: hostname}))
             }
         }
         if (!init || (init && initState.req.protocol !== protocol)) {
-            if (stateBefore.req.protocol !== protocol) {
+            if (store.getState("req.protocol") !== protocol) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "protocol", value: protocol}))
             }
         }
         if (!init || (init && initState.req.secure !== secure)) {
-            if (stateBefore.req.secure !== secure) {
+            if (store.getState("req.secure") !== secure) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "secure", value: secure}))
             }
         }
         if (!init || (init && initState.req.remoteAddress !== remoteAddress)) {
-            if (stateBefore.req.remoteAddress !== remoteAddress) {
+            if (store.getState("req.remoteAddress") !== remoteAddress) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "remoteAddress", value: remoteAddress}))
             }
         }
         if (!init || (init && initState.req.userAgent !== userAgent)) {
-            if (stateBefore.req.userAgent !== userAgent) {
+            if (store.getState("req.userAgent") !== userAgent) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "userAgent", value: userAgent}))
             }
         }
         if (!init || (init && initState.req.query !== query)) {
-            if (stateBefore.req.query !== query) {
+            if (store.getState("req.query") !== query) {
                 wappResponse.store.dispatch(wapp.states.runAction("req", {name: "query", value: query}))
             }
         }
 
 
         if (!init || (init && initState.res.statusCode !== statusCode)) {
-            if (stateBefore.res.statusCode !== statusCode) {
+            if (store.getState("res.statusCode") !== statusCode) {
                 wappResponse.store.dispatch(wapp.states.runAction("res", {name: "statusCode", value: statusCode}))
             }
         }
         if (!init || (init && initState.res.statusMessage !== statusMessage)) {
-            if (stateBefore.res.statusMessage !== statusMessage) {
+            if (store.getState("res.statusMessage") !== statusMessage) {
                 wappResponse.store.dispatch(wapp.states.runAction("res", {name: "statusMessage", value: statusMessage}))
             }
         }
         if (!init || (init && initState.res.errorMessage !== errorMessage)) {
-            if (stateBefore.res.errorMessage !== errorMessage) {
+            if (store.getState("res.errorMessage") !== errorMessage) {
                 wappResponse.store.dispatch(wapp.states.runAction("res", {name: "errorMessage", value: errorMessage}))
             }
         }
         if (!init || (init && initState.res.appStateName !== appStateName)) {
-            if (stateBefore.res.appStateName !== appStateName) {
+            if (store.getState("res.appStateName") !== appStateName) {
                 wappResponse.store.dispatch(wapp.states.runAction("res", {name: "appStateName", value: appStateName}))
             }
         }
         if (!init || (init && initState.res.containerElementId !== containerElementId)) {
-            if (stateBefore.res.containerElementId !== containerElementId) {
+            if (store.getState("res.containerElementId") !== containerElementId) {
                 wappResponse.store.dispatch(wapp.states.runAction("res", {name: "containerElementId", value: containerElementId}))
             }
         }
-
-        wappResponse.state = wappResponse.store.getState();
 
         next();
 
