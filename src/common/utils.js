@@ -16,7 +16,7 @@ export const defaultDescriptor = {
 };
 
 export function copyObject(obj) {
-    
+
     function cloneObj() {
         const clone = {};
         for (let key in obj) {
