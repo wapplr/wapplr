@@ -1,4 +1,3 @@
-const url = require("url");
 const fs = require("fs");
 const path = require("path");
 
@@ -6,13 +5,11 @@ export default function serveStatic (publicPath) {
 
     return function staticMiddleware(req, res, next) {
 
-        // parse URL
-        const parsedUrl = url.parse(req.wappRequest.url);
+        let parsedUrl = {pathname: req.wappRequest.path};
+        try {
+            parsedUrl = new URL(req.wappRequest.url);
+        } catch (e){}
 
-        // extract URL path
-        // Avoid https://en.wikipedia.org/wiki/Directory_traversal_attack
-        // e.g curl --path-as-is http://localhost:9000/../fileInDanger.txt
-        // by limiting the path to current directory only
         const sanitizePath = path.normalize(parsedUrl.pathname).replace(/^(\.\.[\/\\])+/, "");
         const pathname = path.join(publicPath, sanitizePath);
 
@@ -23,7 +20,6 @@ export default function serveStatic (publicPath) {
             return next();
         }
 
-        // read file from file system
         try {
             const data = fs.readFileSync(pathname);
             const stats = fs.statSync(pathname);

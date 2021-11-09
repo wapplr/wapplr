@@ -49,13 +49,16 @@ function createDefaultRequestManager(p = {}) {
         if (!fetch && typeof window !== "undefined" && window.fetch){
             fetch = window.fetch;
         }
+        if (p.fetch) {
+            fetch = p.fetch;
+        }
 
-        const {requestName, req} = p;
+        const {requestName, req, formatBeforeRequest = (url, options)=>[url, options]} = p;
 
         const request = (requestName && requestManager.requests[requestName]) ? requestManager.requests[requestName] : (p.request) ? p.request : null;
 
         const {url, options = {}} = request;
-        const {body, getBody} = options;
+        const {body, getBody, ...restOptions} = options;
 
         let requestBody = (typeof getBody == "function") ? getBody({wapp, ...p}) : body;
 
@@ -67,10 +70,10 @@ function createDefaultRequestManager(p = {}) {
         let response = null;
 
         try {
-            response = await fetch(url, {
-                ...options,
+            response = await fetch(...formatBeforeRequest(url, {
+                ...restOptions,
                 body: requestBody,
-            });
+            }, p));
 
             if (response && response.json){
                 response = await response.json();
@@ -83,11 +86,9 @@ function createDefaultRequestManager(p = {}) {
             return response;
 
         } catch (e) {
-            console.log(e)
+            console.log(e);
+            return {error: e}
         }
-
-        return null;
-
     }
 
     const requestManager = Object.create(Object.prototype, {

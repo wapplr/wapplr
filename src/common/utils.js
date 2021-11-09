@@ -44,6 +44,6 @@ export function copyObject(obj) {
         return cloneArr();
     }
 
-    return obj;
+    return (obj?.toJSON) ? obj.toJSON() : obj;
 
 }
