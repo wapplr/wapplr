@@ -30,11 +30,19 @@ export default function createClient(p = {}) {
 
     function defaultListen () {
         wapplrClient.close();
-        wapplrClient.history.listen(function ({action, location}) {
-            wapplrClient.app({history: {action, location}});
+        wapplrClient.history.listen(function ({action, location, state}) {
+            wapplrClient.app({history: {action, location, state}});
         });
 
-        wapplrClient.app({history: {action: "POP", location: history.location}}, {}, function out() {
+        wapplrClient.app({
+            history: {
+                action: "POP",
+                location: {
+                    pathname: window.location.pathname,
+                    search: window.location.search,
+                    hash: window.location.hash,
+                },
+                state:{key: 0}}}, {}, function out() {
             const globals = wapp.globals;
             const { WAPP } = globals;
 

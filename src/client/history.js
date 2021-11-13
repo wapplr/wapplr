@@ -42,10 +42,10 @@ function createHistoryManager() {
         })
     }
 
-    function defaultHandlePop(e) {
+    function defaultHandlePop() {
 
-        let { pathname, search, hash } = window.location;
-        let state = globalHistory.state || {};
+        const { pathname, search, hash } = window.location;
+        const state = globalHistory.state || {};
 
         const newLocation = {
             pathname,
@@ -55,10 +55,7 @@ function createHistoryManager() {
 
         state.key = state.key || createKey();
 
-        history.location = newLocation;
-        history.state = state;
-
-        defaultRunListeners({action:"POP", location: {...history.location, key: history.state.key}})
+        history.runListeners({action:"POP", location: {...newLocation, key: state.key}, state})
     }
 
     function defaultInit() {
@@ -102,9 +99,9 @@ function createHistoryManager() {
         return partialPath;
     }
 
-    function defaultPush(to, state = {}){
+    function defaultPush(to, inputState){
 
-        let { pathname, search, hash } = window.location;
+        const { pathname, search, hash } = window.location;
         const newLocation = {
             pathname,
             search,
@@ -113,14 +110,12 @@ function createHistoryManager() {
         };
 
         const url = createHref(newLocation);
+        const state = inputState || {};
         state.key = state.key || createKey();
-
-        history.location = newLocation;
-        history.state = state;
 
         globalHistory.pushState(state, "", url);
 
-        history.runListeners({action:"PUSH", location: {...history.location, key: history.state.key}});
+        history.runListeners({action:"PUSH", location: {...newLocation, key: state.key}, state});
     }
 
     function defaultGo(delta) {
@@ -133,6 +128,10 @@ function createHistoryManager() {
         return history.addListener(fn);
     }
 
+    function defaultGetState() {
+        return history.globalHistory.state || {};
+    }
+
     const history = Object.create(Object.prototype, {
         globalHistory: {
             ...defaultDescriptor,
@@ -140,13 +139,11 @@ function createHistoryManager() {
             enumerable: false,
             value: globalHistory
         },
-        location: {
+        getState: {
             ...defaultDescriptor,
-            value: {
-                pathname: window.location.pathname,
-                search: window.location.search,
-                hash: window.location.hash,
-            },
+            writable: false,
+            enumerable: false,
+            value: defaultGetState
         },
         key: {
             ...defaultDescriptor,
