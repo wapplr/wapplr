@@ -15,13 +15,17 @@ export const defaultDescriptor = {
     configurable: false,
 };
 
-export function copyObject(obj) {
+export function copyObject(obj, options = {}) {
 
     function cloneObj() {
+        const {skip = [], keep = []} = options;
         const clone = {};
         for (let key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                clone[key] = copyObject(obj[key]);
+            if (keep.indexOf(key) === -1 && skip.indexOf(key) === -1 && obj.hasOwnProperty(key)) {
+                clone[key] = copyObject(obj[key], options);
+            }
+            if (keep.indexOf(key) === -1){
+                clone[key] = obj[key];
             }
         }
         return clone;
@@ -29,7 +33,7 @@ export function copyObject(obj) {
 
     function cloneArr() {
         return obj.map(function (item) {
-            return copyObject(item);
+            return copyObject(item, options);
         });
     }
 
