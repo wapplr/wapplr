@@ -24,7 +24,7 @@ export function copyObject(obj, options = {}) {
             if (keep.indexOf(key) === -1 && skip.indexOf(key) === -1 && obj.hasOwnProperty(key)) {
                 clone[key] = copyObject(obj[key], options);
             }
-            if (keep.indexOf(key) === -1){
+            if (keep.indexOf(key) > -1){
                 clone[key] = obj[key];
             }
         }
