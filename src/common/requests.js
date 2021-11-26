@@ -79,7 +79,7 @@ function createDefaultRequestManager(p = {}) {
                 response = await response.json();
             }
 
-            if (response && response.data) {
+            if (response && response.data && !response.errors && !response.error) {
                 response = response.data;
             }
 
