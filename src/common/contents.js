@@ -9,6 +9,9 @@ function createDefaultContentManager(p = {}) {
         const {contentName} = route;
         const contents = contentManager.contents;
         const content = (contentName && contents[contentName]) ? {...contents[contentName]} : null;
+        if (contentManager.firstRequest){
+            await contentManager.firstRequest({wapp, req, res});
+        }
         if (content && content.request){
             await content.request({wapp, req, res});
         }
@@ -139,7 +142,11 @@ function createDefaultContentManager(p = {}) {
         getComponent: {
             ...defaultDescriptor,
             value: defaultGetComponent
-        }
+        },
+        firstRequest: {
+            ...defaultDescriptor,
+            value: null
+        },
     });
     return contentManager;
 
