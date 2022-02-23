@@ -15,7 +15,8 @@ export default function html({wapp, req, res}) {
         appStyle = style
     } = config;
 
-    const {state, content = {}, statusCode = 200, containerElementId = "app", appStateName = "APP_STATE"} = res.wappResponse;
+    const {store, content = {}, statusCode = 200, containerElementId = "app", appStateName = "APP_STATE"} = res.wappResponse;
+    const state = (store) ? store.getState() : {};
 
     let {render = "", title = "", description = "", author = ""} = content;
 
