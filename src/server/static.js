@@ -16,24 +16,12 @@ function destroy(stream) {
     return stream;
 }
 
-function endStream(req, res, stream) {
-    if (req.__onFinishedRemoveListener){
-        req.__onFinishedRemoveListener();
-        req.__onFinishedRemoveListener = null;
-    }
-    if (res.__onFinishedRemoveListener){
-        res.__onFinishedRemoveListener();
-        res.__onFinishedRemoveListener = null;
-    }
-    destroy(stream);
-}
-
 function onFinished(req, res, callback) {
 
     function isFinishedResponse() {
         let socket = res.socket;
         if (typeof res.finished === "boolean") {
-            return Boolean(res.finished || (socket && !socket.writable))
+            return Boolean(res.finished || res.writableEnded || (socket && !socket.writable))
         }
     }
 
@@ -68,6 +56,38 @@ function onFinished(req, res, callback) {
 
 }
 
+export function endStream(req, res, stream) {
+    if (req.__onFinishedRemoveListener){
+        req.__onFinishedRemoveListener();
+        req.__onFinishedRemoveListener = null;
+    }
+    if (res.__onFinishedRemoveListener){
+        res.__onFinishedRemoveListener();
+        res.__onFinishedRemoveListener = null;
+    }
+    destroy(stream);
+}
+
+export function addCloseEventsForReadableStream(req, res, stream) {
+
+    req.on("close", ()=>{
+        endStream(req, res, stream);
+    });
+
+    req.connection.on("close", ()=>{
+        endStream(req, res, stream);
+    });
+
+    onFinished(req, res, ()=>{
+        endStream(req, res, stream);
+    });
+
+    stream.on("close", function onclose () {
+        endStream(req, res, stream);
+    });
+
+}
+
 export default function serveStatic (publicPath) {
 
     return function staticMiddleware(req, res, next) {
@@ -80,8 +100,8 @@ export default function serveStatic (publicPath) {
         const sanitizePath = path.normalize(parsedUrl.pathname).replace(/^(\.\.[\/\\])+/, "");
         const pathname = path.join(publicPath, sanitizePath);
 
-        const paredSanitizePath = path.parse(pathname);
-        const ext = paredSanitizePath.ext;
+        const parsedSanitizePath = path.parse(pathname);
+        const ext = parsedSanitizePath.ext;
 
         if(!fs.existsSync(pathname) || !ext) {
             return next();
@@ -97,18 +117,12 @@ export default function serveStatic (publicPath) {
             res.wappResponse.sendData = {
                 data,
                 stats,
-                parsedPath: paredSanitizePath
+                parsedPath: parsedSanitizePath
             };
 
             stream = fs.createReadStream(pathname);
 
-            onFinished(req, res, ()=>{
-                endStream(req, res, stream);
-            });
-
-            stream.on("close", function onopen () {
-                endStream(req, res, stream);
-            });
+            addCloseEventsForReadableStream(req, res, stream);
 
             stream.on("error", function onerror (err) {
                 endStream(req, res, stream);

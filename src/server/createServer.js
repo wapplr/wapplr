@@ -139,6 +139,23 @@ export default function createServer(p = {}) {
             httpServer.listen(port, function () {
                 console.log(`The server is running at http://localhost:${port}/`);
             });
+
+            httpServer.__sockets = new Set();
+
+            httpServer.on("connection", socket => {
+                httpServer.__sockets.add(socket);
+                socket.on("close", () => {
+                    httpServer.__sockets.delete(socket);
+                });
+            });
+
+            httpServer.__destroySockets = function() {
+                const sockets = httpServer.__sockets;
+                for (const socket of sockets.values()) {
+                    socket.destroy();
+                }
+            };
+
         }
 
         if (key && cert && portSSL){
@@ -150,6 +167,22 @@ export default function createServer(p = {}) {
             httpsServer.listen(portSSL, function () {
                 console.log(`The server is running at https://localhost:${portSSL}/ with HTTP2 protocol`);
             });
+
+            httpsServer.__sockets = new Set();
+
+            httpsServer.on("connection", socket => {
+                httpsServer.__sockets.add(socket);
+                socket.on("close", () => {
+                    httpsServer.__sockets.delete(socket);
+                });
+            });
+
+            httpsServer.__destroySockets = function() {
+                const sockets = httpsServer.__sockets;
+                for (const socket of sockets.values()) {
+                    socket.destroy();
+                }
+            };
         }
 
     }
@@ -171,6 +204,7 @@ export default function createServer(p = {}) {
         let closed = 0;
 
         shouldClose.forEach(function (httpServer) {
+            httpServer.__destroySockets();
             httpServer.close(function () {
                 closed = closed + 1;
                 servers[port] = null;
