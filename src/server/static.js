@@ -46,7 +46,6 @@ function onFinished(req, res, callback) {
 
     function removeListener() {
         if (req.__onFinishedInterval) {
-            console.log("remove listener", req.path);
             clearInterval(req.__onFinishedInterval);
             req.__onFinishedInterval = 0;
         }
