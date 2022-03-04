@@ -42,7 +42,9 @@ export default function createClient(p = {}) {
                     search: window.location.search,
                     hash: window.location.hash,
                 },
-                state:{key: 0}}}, {}, function out() {
+                state: window.history.state || {key: "initial"}
+            }}, {}, function out() {
+
             const globals = wapp.globals;
             const { WAPP } = globals;
 

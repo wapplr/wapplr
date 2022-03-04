@@ -55,7 +55,7 @@ function createHistoryManager() {
 
         state.key = state.key || createKey();
 
-        history.runListeners({action:"POP", location: {...newLocation, key: state.key}, state})
+        history.runListeners({action:"POP", location: {...newLocation}, state})
     }
 
     function defaultInit() {
@@ -115,7 +115,7 @@ function createHistoryManager() {
 
         globalHistory.pushState(state, "", url);
 
-        history.runListeners({action:"PUSH", location: {...newLocation, key: state.key}, state});
+        history.runListeners({action:"PUSH", location: {...newLocation}, state});
     }
 
     function defaultGo(delta) {
@@ -144,10 +144,6 @@ function createHistoryManager() {
             writable: false,
             enumerable: false,
             value: defaultGetState
-        },
-        key: {
-            ...defaultDescriptor,
-            value: "initial",
         },
         listeners: {
             ...defaultDescriptor,
