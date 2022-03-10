@@ -101,11 +101,11 @@ function createHistoryManager() {
 
     function defaultPush(to, inputState){
 
-        const { pathname, search, hash } = window.location;
+        const { pathname } = window.location;
         const newLocation = {
             pathname,
-            search,
-            hash,
+            search: "",
+            hash: "",
             ...(typeof to === "string" ? history.parsePath(to) : to),
         };
 
