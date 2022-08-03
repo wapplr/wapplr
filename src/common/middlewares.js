@@ -342,7 +342,7 @@ function createWappMiddleware(p = {}) {
 
 }
 
-export default function createMiddlewares(p, step) {
+export default function createMiddlewares(p) {
 
     return {
         wapp: createWappMiddleware(p),

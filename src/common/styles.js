@@ -8,7 +8,11 @@ export function createDefaultStyleManager(p = {}) {
 
     function defaultInsertCss(css, moduleId) {
 
-        const id = `s${moduleId}`;
+        const targetObject = (wapp.getTargetObject) ? wapp.getTargetObject() : wapp;
+        const stylesConfig = targetObject.config?.styles || {};
+        const {styleIdPrefix = "s"} = stylesConfig;
+
+        const id = `${styleIdPrefix}${moduleId}`;
 
         let elem = document.getElementById(id);
         let create = false;
