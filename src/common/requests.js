@@ -58,19 +58,20 @@ function createDefaultRequestManager(p = {}) {
         const request = (requestName && requestManager.requests[requestName]) ? requestManager.requests[requestName] : (p.request) ? p.request : null;
 
         const {url, options = {}} = request;
-        const {body, getBody, ...restOptions} = options;
+        const {body, getBody, headers, ...restOptions} = options;
 
         let requestBody = (typeof getBody == "function") ? getBody({wapp, ...p}) : body;
 
         const cookie = (req && req.headers) ? req.headers.cookie : null;
-        if (cookie) {
-            options.headers.cookie = cookie;
-        }
 
         let response = null;
 
         try {
             response = await fetch(...formatBeforeRequest(url, {
+                headers: {
+                    ...cookie ? {cookie} : {},
+                    ...headers,
+                },
                 ...restOptions,
                 body: requestBody,
             }, p));
