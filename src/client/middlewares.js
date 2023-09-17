@@ -23,25 +23,25 @@ export function createRenderMiddleware(p = {}) {
 
     async function defaultHandle(req, res, out){
 
-        const statesMiddlewares = Object.keys(renderMiddleware.handles).map(function (key) {return renderMiddleware.handles[key]});
+        const renderMiddlewares = Object.keys(renderMiddleware.handles).map(function (key) {return renderMiddleware.handles[key]});
 
         let index = 0;
 
-        function next(err) {
+        async function next(err) {
 
-            if (statesMiddlewares[index]){
-                const func = statesMiddlewares[index];
+            if (renderMiddlewares[index]){
+                const func = renderMiddlewares[index];
                 index = index + 1;
-                return func(req, res, (err) ? function(){next(err)} : next)
+                return await func(req, res, (err) ? async function(){await next(err)} : next)
             } else if (typeof out === "function") {
                 index = 0;
-                return out(err);
+                return await out(err);
             }
 
             return null;
         }
 
-        return next();
+        return await next();
 
     }
 

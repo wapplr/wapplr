@@ -157,11 +157,11 @@ export default function createApp(p = {}) {
                 return res;
             };
 
-            res.send = res.send || function (html) {
-                res.end(html);
+            res.send = res.send || function (html, callback) {
+                res.end(html, callback);
             };
 
-            res.end = res.end || function (html) {
+            res.end = res.end || function (html, callback) {
                 if (!res.headersSent) {
                     Object.defineProperty(res, "headersSent", {...defaultDescriptor, enumerable: false, writable: false, value: true});
                     res.container.innerHTML = html;
@@ -177,6 +177,9 @@ export default function createApp(p = {}) {
                     }
                 } else {
                     //throw Error
+                }
+                if (callback) {
+                    callback();
                 }
             };
 

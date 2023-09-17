@@ -187,6 +187,33 @@ function createWappMiddleware(p = {}) {
                     }
                 }
 
+
+                if (wappResponse.store) {
+
+                    if (wappResponse.store.getState("res.statusCode") !== wappResponse.statusCode) {
+                        wappResponse.store.dispatch(wapp.states.runAction("res", {
+                            name: "statusCode",
+                            value: wappResponse.statusCode
+                        }))
+                    }
+
+                    if (wappResponse.store.getState("res.statusMessage") !== wappResponse.statusMessage) {
+                        wappResponse.store.dispatch(wapp.states.runAction("res", {
+                            name: "statusMessage",
+                            value: wappResponse.statusMessage
+                        }))
+                    }
+
+                    if (wappResponse.store.getState("res.errorMessage") !== wappResponse.errorMessage) {
+                        wappResponse.store.dispatch(wapp.states.runAction("res", {
+                            name: "errorMessage",
+                            value: wappResponse.errorMessage
+                        }))
+                    }
+
+                }
+
+
                 return res.status(...attributes);
 
             }
@@ -201,8 +228,15 @@ function createWappMiddleware(p = {}) {
                 };
                 wappMiddleware.runSendMiddlewares(req, res, function next() {
                     const endHtml = wappResponse.sendData?.data || "";
-                    res.send(...[endHtml, ...restAttr]);
-                    wappResponse.sended = true;
+                    const callback = restAttr[0];
+                    if (typeof callback === 'function') {
+                        res.send(...[endHtml, ()=>{
+                            callback();
+                            wappResponse.sended = true;
+                        }, ...restAttr.slice(1)]);
+                    } else {
+                        res.send(...[endHtml, ...restAttr]);
+                    }
                 });
             }
         };
