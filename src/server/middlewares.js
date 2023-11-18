@@ -263,12 +263,20 @@ export default function createMiddlewares(p) {
                 const {data, stats = {}, parsedPath = {}} = sendData;
                 let html = data;
                 const {ext = ".html"} = parsedPath;
+                const charSet = sendData.charSet ? sendData.charSet : ext === '.html' ? 'utf-8' : '';
                 const {mtime} = stats;
+
                 if (!res.getHeader("Accept-Ranges")) {
                     res.setHeader("Accept-Ranges", "bytes")
                 }
                 if (!res.getHeader("Content-Type")) {
-                    res.setHeader("Content-Type", mimeType[ext] || "text/plain");
+                    res.setHeader(
+                        "Content-Type",
+                        [
+                            mimeType[ext] || "text/plain",
+                            charSet ? 'charset='+charSet : ''
+                        ].filter((t)=>t).join('; ')
+                    );
                 }
                 if (!res.getHeader("Content-Length")) {
                     res.setHeader("Content-Length", Buffer.byteLength(html));
