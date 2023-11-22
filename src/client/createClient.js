@@ -13,7 +13,10 @@ export default function createClient(p = {}) {
     const {config} = createConfig(p);
     const clientConfig = config.client || {};
 
-    const {disableUseDefaultMiddlewares = false, ...rest} = clientConfig;
+    const {disableUseDefaultMiddlewares = false, styles = {}, ...rest} = clientConfig;
+    const {
+        disableClearMainStyle = false
+    } = styles;
 
     const defaultConfig = Object.create(Object.prototype, {
         disableUseDefaultMiddlewares: {
@@ -48,12 +51,14 @@ export default function createClient(p = {}) {
             const globals = wapp.globals;
             const { WAPP } = globals;
 
-            setTimeout(function () {
-                const elem = document.getElementById("css_"+WAPP);
-                if (elem) {
-                    elem.parentNode.removeChild(elem);
-                }
-            },2000)
+            if (!disableClearMainStyle) {
+                setTimeout(function () {
+                    const elem = document.getElementById("css_" + WAPP);
+                    if (elem) {
+                        elem.parentNode.removeChild(elem);
+                    }
+                }, 2000)
+            }
         });
 
     }

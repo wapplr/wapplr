@@ -31,20 +31,26 @@ export default function html({wapp, req, res}) {
 
     if (typeof render === "function") {render = render({wapp, req, res})}
 
-    const scripts = assets.getScripts();
+    wapp.styles.use(appStyle);
 
-    let scriptText = scripts.map(function (script) {
-        if (script) {
-            return `<script key="${script}" src="${script}" ></script>`;
-        }
-        return "";
-    }).join(" ");
+    const styles = wapp.styles.getCssText();
+    const styleText = styles.map(function(style) {return `<style id="${style.id}">${style.cssText}</style>`}).join("");
+
+    const csStyles = assets.getCsStyles();
+    const cssText = csStyles.map(function(css) {
+        return `<link rel="stylesheet" as="style" type="text/css" href="${css}" />`
+    }).join("");
 
     const stateText = `<script>window["${appStateName}"] = ${JSON.stringify(state || {})}</script>`;
 
-    wapp.styles.use(appStyle);
-    const styles = wapp.styles.getCssText();
-    const styleText = styles.map(function(style) {return `<style id="${style.id}">${style.cssText}</style>`}).join("");
+    const scripts = assets.getScripts();
+
+    const scriptText = scripts.map(function (script) {
+        if (script) {
+            return `<script src="${script}" ></script>`;
+        }
+        return "";
+    }).join(" ");
 
     const headComponent = wapp.contents.getComponent("head");
     const headText = (headComponent) ? headComponent.render(wapp) : "";
@@ -53,7 +59,7 @@ export default function html({wapp, req, res}) {
     return`<!DOCTYPE html>
 <html lang="${htmlLang}">
     <head>
-        <meta charset="utf-8">
+        <meta charset="UTF-8">
         <title>${title}</title>
         <meta name="description" content="${description}">
         <meta name="author" content="${author}">
@@ -62,8 +68,9 @@ export default function html({wapp, req, res}) {
         <link rel="manifest" href="${manifest}" />
         <link rel="icon" href=${icon}>
         <link rel="apple-touch-icon" href="${appleTouchIcon || icon}">
-        ${styleText}
         ${headText}
+        ${styleText}
+        ${cssText}
     </head>
     <body>
         <div class="${appStyle.app}" id="${containerElementId}">${render}</div>

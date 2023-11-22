@@ -260,7 +260,7 @@ export default function createMiddlewares(p) {
         headers: function (req, res, next) {
             const {sendData = {}} = res.wappResponse;
             if (res.setHeader) {
-                const {data, stats = {}, parsedPath = {}} = sendData;
+                const {data, stats = {}, parsedPath = {}, dontSetContentLength} = sendData;
                 let html = data;
                 const {ext = ".html"} = parsedPath;
                 const charSet = sendData.charSet ? sendData.charSet : ext === '.html' ? 'utf-8' : '';
@@ -278,7 +278,7 @@ export default function createMiddlewares(p) {
                         ].filter((t)=>t).join('; ')
                     );
                 }
-                if (!res.getHeader("Content-Length")) {
+                if (!res.getHeader("Content-Length") && !dontSetContentLength) {
                     res.setHeader("Content-Length", Buffer.byteLength(html));
                 }
                 if (!res.getHeader("Last-Modified") && mtime) {

@@ -51,7 +51,7 @@ export function createDefaultStyleManager(p = {}) {
 
     function defaultAdd(style) {
 
-        let cssText = style._getCss();
+        let cssText = style._getCss ? style._getCss() : '';
         style._insertCss = function _insertCss() {
             const {insertCss} = styleManager;
             const moduleId = (style._module && style._module.id) ? style._module.id : "";
@@ -106,12 +106,19 @@ export function createDefaultStyleManager(p = {}) {
     }
 
     function defaultGetCssText() {
+
         const globals = wapp.globals || {};
+
         const { WAPP = "buildHash", DEV } = globals;
-        let cssText = [...styleManager.css].map(function(style){ return style._getCss()}).join("");
+
+        let cssText = [...styleManager.css].map(function(style){
+            return style._getCss ? style._getCss() : ''
+        }).join("");
+
         if (!DEV) {
             cssText = cssText.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/gm, " ")
         }
+
         return [{id:"css_"+WAPP, cssText}]
     }
 
@@ -178,10 +185,11 @@ export default function createStyleManager(p = {}) {
 
     function defaultHandle(req, res, next){
         const targetObject = (wapp.getTargetObject) ? wapp.getTargetObject() : wapp;
-        if (!targetObject.config ||
-            (targetObject.config && !targetObject.config.styles) ||
-            (targetObject.config && targetObject.config.styles && !targetObject.config.styles.disableClearStyles)){
+        if (!targetObject?.config?.styles?.disableClearStyles){
             stylesMiddleware.styleManager.clear();
+        }
+        if (targetObject?.config?.assets?.cssToInlineStyle?._getCss) {
+            wapp.styles.add({_getCss: targetObject.config.assets.cssToInlineStyle._getCss})
         }
         next();
     }

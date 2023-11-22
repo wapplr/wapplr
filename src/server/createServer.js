@@ -1,5 +1,7 @@
-import http from "http";
-import http2 from "http2";
+import http from "node:http";
+import http2 from "node:http2";
+import fs from "node:fs";
+import path from "node:path";
 
 import createWapp from "../common";
 import createApp from "./app.js";
@@ -18,6 +20,70 @@ export default function createServer(p = {}) {
     const serverConfig = config.server || {};
 
     const {port, portSSL, publicPath, assets = {}, credentials = {}, disableUseDefaultMiddlewares = false, ...rest} = serverConfig;
+
+    const defaultCssToInlineStyle = Object.create(Object.prototype, {
+        loadCssToStyle: {
+            ...defaultDescriptor,
+            value: (a)=>{
+                if (Array.isArray(a) && a.length) {
+
+                    const intersection = a.filter(x => wapp.server.config.assets.cssToInlineStyle.css.includes(x));
+                    if (intersection.length === a.length) {
+                        return
+                    }
+
+                    function getThemeCss() {
+                        let themeCss = [];
+                        if (assets && assets.chunks) {
+                            Object.keys(assets.chunks).forEach(function(key) {
+                                if (key === 'client') {
+                                    const files = assets.chunks[key].sort();
+                                    files.forEach(function(style) {
+                                        if (style && style.match(".css") && a.indexOf(style) > -1 && !(themeCss.indexOf(style) > -1)) {
+                                            themeCss.push(style);
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                        return themeCss;
+                    }
+
+                    const themeCss = getThemeCss();
+                    let text = "";
+                    const css = [];
+
+                    themeCss.forEach((cssPath)=>{
+                        if (fs.existsSync(path.join(publicPath, cssPath))) {
+                            const cssContent = fs.readFileSync(path.join(publicPath, cssPath));
+                            if (cssContent) {
+                                text = [text, cssContent].filter((t)=>t).join(" ");
+                                css.push(cssPath)
+                            }
+                        }
+                    });
+
+                    wapp.server.config.assets.cssToInlineStyle.text = text;
+                    wapp.server.config.assets.cssToInlineStyle.css = css;
+
+                }
+            }
+        },
+        _getCss: {
+            ...defaultDescriptor,
+            value: ()=>{
+                return wapp.server.config.assets.cssToInlineStyle.text || ""
+            }
+        },
+        text: {
+            ...defaultDescriptor,
+            value: ''
+        },
+        css: {
+            ...defaultDescriptor,
+            value: []
+        }
+    });
 
     const defaultAssets = Object.create(Object.prototype, {
         client: {
@@ -39,11 +105,13 @@ export default function createServer(p = {}) {
                 let chunks = [];
                 if (assets && assets.chunks){
                     Object.keys(assets.chunks).forEach(function (key) {
-                        assets.chunks[key].forEach(function (script) {
-                            if (script.match(".js") && chunks.indexOf(script) === -1){
-                                chunks.push(script);
-                            }
-                        })
+                        if (key === 'client') {
+                            assets.chunks[key].forEach(function(script) {
+                                if (script && script.match(".js") && chunks.indexOf(script) === -1) {
+                                    chunks.push(script);
+                                }
+                            })
+                        }
                     })
                 }
 
@@ -51,7 +119,7 @@ export default function createServer(p = {}) {
                 if (assets){
                     Object.keys(assets).forEach(function (key) {
                         if (key !== "chunks" && scripts.indexOf(assets[key]) === -1) {
-                            if (assets[key].match(".js")) {
+                            if (assets[key] && assets[key].match(".js")) {
                                 scripts.push(assets[key])
                             }
                         }
@@ -60,7 +128,44 @@ export default function createServer(p = {}) {
 
                 return scripts
             }
-        }
+        },
+        cssToInlineStyle: {
+            ...defaultDescriptor,
+            enumerable: false,
+            value: defaultCssToInlineStyle
+        },
+        getCsStyles: {
+            ...defaultDescriptor,
+            enumerable: false,
+            value: function () {
+                let chunks = [];
+                if (assets && assets.chunks) {
+                    Object.keys(assets.chunks).forEach(function(key) {
+                        if (key === 'client') {
+                            const files = assets.chunks[key].sort();
+                            files.forEach(function(style) {
+                                if (style && style.match(".css") && chunks.indexOf(style) === -1 && !(wapp.server.config.assets.cssToInlineStyle.css?.indexOf(style) > -1)) {
+                                    chunks.push(style);
+                                }
+                            })
+                        }
+                    })
+                }
+
+                let styles = [...chunks];
+                if (assets) {
+                    Object.keys(assets).forEach(function(key) {
+                        if (key !== "chunks" && styles.indexOf(assets[key]) === -1) {
+                            if (assets[key] && assets[key].match(".css") && !(wapp.server.config.assets.cssToInlineStyle.css?.indexOf(assets[key]) > -1)) {
+                                styles.push(assets[key])
+                            }
+                        }
+                    })
+                }
+
+                return styles
+            }
+        },
     });
 
     const defaultCredentials = Object.create(Object.prototype, {
