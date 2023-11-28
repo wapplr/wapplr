@@ -22,7 +22,8 @@ export const mimeType = {
     ".doc": "application/msword",
     ".eot": "application/vnd.ms-fontobject",
     ".ttf": "application/x-font-ttf",
-    ".xml": "application/xml"
+    ".xml": "application/xml",
+    ".map": "application/json"
 };
 
 export function createRenderMiddleware(p = {}) {

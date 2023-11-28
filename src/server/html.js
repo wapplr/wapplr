@@ -38,7 +38,7 @@ export default function html({wapp, req, res}) {
 
     const csStyles = assets.getCsStyles();
     const cssText = csStyles.map(function(css) {
-        return `<link rel="stylesheet" as="style" type="text/css" href="${css}" />`
+        return `<link rel="stylesheet" type="text/css" href="${css}" />`
     }).join("");
 
     const stateText = `<script>window["${appStateName}"] = ${JSON.stringify(state || {})}</script>`;
