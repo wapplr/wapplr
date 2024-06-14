@@ -218,7 +218,7 @@ export default function createServer(p = {}) {
         }
     });
 
-    function defaultListen() {
+    function defaultListen({hostname} = p) {
 
         const {port, portSSL, credentials} = wapplrServer.config;
         const {key, cert} = credentials;
@@ -241,8 +241,8 @@ export default function createServer(p = {}) {
                 httpServer = http.createServer(app);
                 wapplrServer.servers[port] = httpServer;
             }
-            httpServer.listen(port, function () {
-                console.log(`The server is running at http://localhost:${port}/`);
+            httpServer.listen(port, ...hostname ? [hostname] : [], function () {
+                console.log(`The server is running at http://${hostname || 'localhost'}:${port}/`);
             });
 
             httpServer.__sockets = new Set();
@@ -269,8 +269,8 @@ export default function createServer(p = {}) {
                 wapplrServer.servers[portSSL] = httpsServer;
             }
 
-            httpsServer.listen(portSSL, function () {
-                console.log(`The server is running at https://localhost:${portSSL}/ with HTTP2 protocol`);
+            httpsServer.listen(portSSL,  ...hostname ? [hostname] : [], function () {
+                console.log(`The server is running at https://${hostname || 'localhost'}:${portSSL}/ with HTTP2 protocol`);
             });
 
             httpsServer.__sockets = new Set();
