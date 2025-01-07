@@ -45,7 +45,7 @@ function createDefaultRequestManager(p = {}) {
 
         const wapp = requestManager.wapp;
 
-        let fetch = requestManager.fetch;
+        let fetch = p.req?.wappRequest?.fetch || requestManager.fetch;
         if (!fetch && typeof window !== "undefined" && window.fetch){
             fetch = window.fetch;
         }
