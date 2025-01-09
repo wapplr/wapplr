@@ -1,4 +1,5 @@
-const fs = require("fs");
+const fs = require("node:fs/promises");
+const fsSync = require("node:fs");
 const path = require("path");
 
 function destroy(stream) {
@@ -90,7 +91,7 @@ export function addCloseEventsForReadableStream(req, res, stream) {
 
 export default function serveStatic (publicPath) {
 
-    return function staticMiddleware(req, res, next) {
+    return async function staticMiddleware(req, res, next) {
 
         let parsedUrl = {pathname: req.wappRequest.path};
         try {
@@ -103,15 +104,21 @@ export default function serveStatic (publicPath) {
         const parsedSanitizePath = path.parse(pathname);
         const ext = parsedSanitizePath.ext;
 
-        if(!fs.existsSync(pathname) || !ext) {
-            return next();
+        if (!ext) {
+            return await next();
+        }
+
+        try {
+            await fs.access(pathname)
+        } catch {
+            return await next();
         }
 
         let stream;
 
         try {
-            const data = fs.readFileSync(pathname);
-            const stats = fs.statSync(pathname);
+            const data = await fs.readFile(pathname);
+            const stats = await fs.stat(pathname);
             res.wappResponse.status(200);
 
             res.wappResponse.sendData = {
@@ -120,7 +127,7 @@ export default function serveStatic (publicPath) {
                 parsedPath: parsedSanitizePath
             };
 
-            stream = fs.createReadStream(pathname);
+            stream = fsSync.createReadStream(pathname);
 
             addCloseEventsForReadableStream(req, res, stream);
 
