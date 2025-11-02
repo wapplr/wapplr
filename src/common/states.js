@@ -1,5 +1,17 @@
 import {defaultDescriptor, mergeProperties, copyObject} from "./utils";
 
+function copy(obj) {
+    let r = {};
+    try {
+        r = structuredClone(obj)
+    } catch (e) {
+        try {
+            r = copyObject(obj)
+        } catch (e) {}
+    }
+    return r;
+}
+
 export function createDefaultStateManager(p = {}) {
 
     const {wapp} = p;
@@ -12,7 +24,7 @@ export function createDefaultStateManager(p = {}) {
                     case "SET_REQ":
                         return {
                             ...state,
-                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copyObject(action.payload.value) : action.payload.value,
+                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copy(action.payload.value) : action.payload.value,
                         };
                     default:
                         return state;
@@ -26,7 +38,7 @@ export function createDefaultStateManager(p = {}) {
                     case "SET_RES":
                         return {
                             ...state,
-                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copyObject(action.payload.value) : action.payload.value,
+                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copy(action.payload.value) : action.payload.value,
                         };
                     case "INS_RES":
                         if (typeof action.payload.value === "object" && action.payload.value &&
@@ -35,13 +47,13 @@ export function createDefaultStateManager(p = {}) {
                                 ...state,
                                 [action.payload.name]: {
                                     ...state[action.payload.name],
-                                    ...copyObject(action.payload.value)
+                                    ...copy(action.payload.value)
                                 },
                             };
                         }
                         return {
                             ...state,
-                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copyObject(action.payload.value) : action.payload.value,
+                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copy(action.payload.value) : action.payload.value,
                         };
                     default:
                         return state;

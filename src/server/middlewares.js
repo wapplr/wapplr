@@ -280,7 +280,7 @@ export default function createMiddlewares(p) {
                         ].filter((t)=>t).join('; ')
                     );
                 }
-                if (!res.getHeader("Content-Length") && !dontSetContentLength) {
+                if (!res.getHeader("Content-Length") && !dontSetContentLength && html) {
                     res.setHeader("Content-Length", Buffer.byteLength(html));
                 }
                 if (!res.getHeader("Last-Modified") && mtime) {
