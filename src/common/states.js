@@ -3,7 +3,8 @@ import {defaultDescriptor, mergeProperties, copyObject} from "./utils";
 function copy(obj) {
     let r = {};
     try {
-        r = structuredClone(obj)
+        const c = obj.toJSON ? obj.toJSON() : obj;
+        r = structuredClone(c)
     } catch (e) {
         try {
             r = copyObject(obj)
