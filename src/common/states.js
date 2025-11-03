@@ -3,8 +3,7 @@ import {defaultDescriptor, mergeProperties, copyObject} from "./utils";
 function copy(obj) {
     let r = {};
     try {
-        const c = obj.toJSON ? obj.toJSON() : obj;
-        r = structuredClone(c)
+        r = structuredClone(obj)
     } catch (e) {
         try {
             r = copyObject(obj)
@@ -25,7 +24,7 @@ export function createDefaultStateManager(p = {}) {
                     case "SET_REQ":
                         return {
                             ...state,
-                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copy(action.payload.value) : action.payload.value,
+                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copyObject(action.payload.value) : action.payload.value,
                         };
                     default:
                         return state;
@@ -39,7 +38,7 @@ export function createDefaultStateManager(p = {}) {
                     case "SET_RES":
                         return {
                             ...state,
-                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copy(action.payload.value) : action.payload.value,
+                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copyObject(action.payload.value) : action.payload.value,
                         };
                     case "INS_RES":
                         if (typeof action.payload.value === "object" && action.payload.value &&
@@ -48,13 +47,13 @@ export function createDefaultStateManager(p = {}) {
                                 ...state,
                                 [action.payload.name]: {
                                     ...state[action.payload.name],
-                                    ...copy(action.payload.value)
+                                    ...copyObject(action.payload.value)
                                 },
                             };
                         }
                         return {
                             ...state,
-                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copy(action.payload.value) : action.payload.value,
+                            [action.payload.name]: (action.payload.value && typeof action.payload.value == "object") ? copyObject(action.payload.value) : action.payload.value,
                         };
                     default:
                         return state;
@@ -119,7 +118,7 @@ export function createDefaultStateManager(p = {}) {
                         }
                     }
                     find(keys.split("."), state);
-                    return (typeof found === "object" && found) ? copyObject(found) : found;
+                    return (typeof found === "object" && found) ? copy(found) : found;
                 }
 
                 try{
